@@ -7,6 +7,34 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Additional styling for the Manage Games Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
+        }
+        .modal-overlay.open { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: #1e1e2f; border: 1px solid #33334d; width: 500px; max-height: 80vh;
+            border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        .modal-header { padding: 16px 20px; border-bottom: 1px solid #33334d; display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { margin: 0; color: #fff; font-size: 1.1rem; }
+        .modal-close { background: none; border: none; color: #a1a1aa; font-size: 1.2rem; cursor: pointer; }
+        .modal-body { padding: 20px; overflow-y: auto; flex-grow: 1; }
+        .game-list-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #27273f; padding: 10px 14px; border-radius: 6px; margin-bottom: 8px;
+        }
+        .game-list-item span { color: #fff; font-family: monospace; font-size: 0.9rem; }
+        .btn-remove-game {
+            background: #ef4444; color: #fff; border: none; padding: 6px 12px;
+            border-radius: 4px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s;
+        }
+        .btn-remove-game:hover { background: #dc2626; }
+        .no-games { text-align: center; color: #8888a0; font-size: 0.9rem; margin-top: 20px; }
+    </style>
 </head>
 <body>
     <!-- Loading screen -->
@@ -170,14 +198,19 @@
                         <button id="addToSteamBtn" class="btn btn-primary btn-add" disabled data-i18n="add_to_steam">
                             Add to Steam
                         </button>
-                        <button id="restartSteamBtn" class="btn btn-danger btn-restart" data-i18n="restart_steam">
+                        <button id="manageGamesBtn" class="btn btn-secondary" style="margin-top: 6px;">
+                            Manage Added Games
+                        </button>
+                        <button id="restartSteamBtn" class="btn btn-danger btn-restart" data-i18n="restart_steam" style="margin-top: 6px;">
                             Restart Steam
                         </button>
                     </div>
 
-                    <!-- Drag & Drop Zone -->
-                    <div id="dropZone" class="drop-zone" style="border: 2px dashed var(--border-light); padding: 12px; text-align: center; border-radius: var(--radius-sm); margin-top: 12px; cursor: pointer;">
-                        <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Drag & Drop .manifest or .lua files here</p>
+                    <!-- Prominent Drag & Drop Zone -->
+                    <div id="dropZone" class="drop-zone" style="border: 2px dashed #4f46e5; background: rgba(79, 70, 229, 0.05); padding: 18px 12px; text-align: center; border-radius: 8px; margin-top: 15px; cursor: pointer; transition: all 0.2s ease;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 6px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <p style="font-size: 0.8rem; font-weight: 600; color: #ffffff; margin: 0 0 4px 0;">Drop .manifest or .lua files here</p>
+                        <p style="font-size: 0.68rem; color: #a1a1aa; margin: 0;">Drag files directly from your computer</p>
                     </div>
                 </div>
 
@@ -254,6 +287,19 @@
         </footer>
     </div>
 
+    <!-- Manage Games Modal -->
+    <div id="manageGamesModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Manage Added Games</h3>
+                <button id="closeModalBtn" class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="installedGamesListContainer">
+                <div class="no-games">Loading installed games...</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Help dialog -->
     <div id="helpOverlay" class="help-overlay" aria-hidden="true">
         <div class="help-modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
@@ -300,22 +346,25 @@
         </div>
     </div>
 
-    <!-- Drag & Drop Handler Script -->
+    <!-- Script handlers for Drag & Drop and Manage Games Modal -->
     <script>
         const dropZone = document.getElementById('dropZone');
         if (dropZone) {
             dropZone.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                dropZone.style.borderColor = 'var(--accent)';
+                dropZone.style.borderColor = '#6366f1';
+                dropZone.style.background = 'rgba(99, 102, 241, 0.1)';
             });
 
             dropZone.addEventListener('dragleave', () => {
-                dropZone.style.borderColor = 'var(--border-light)';
+                dropZone.style.borderColor = '#4f46e5';
+                dropZone.style.background = 'rgba(79, 70, 229, 0.05)';
             });
 
             dropZone.addEventListener('drop', async (e) => {
                 e.preventDefault();
-                dropZone.style.borderColor = 'var(--border-light)';
+                dropZone.style.borderColor = '#4f46e5';
+                dropZone.style.background = 'rgba(79, 70, 229, 0.05)';
 
                 const appIdElem = document.getElementById('appIdDisplay');
                 const appId = appIdElem ? appIdElem.textContent : null;
@@ -332,12 +381,78 @@
 
                 const res = await window.electronAPI.installDroppedFiles({ appId, files: filesData });
                 if (res.success) {
-                    alert(`Successfully installed ${res.count} dropped file(s) into Steam directories!`);
+                    setTimeout(() => {
+                        alert(`Successfully installed ${res.count} dropped file(s) into Steam directories!`);
+                    }, 2000); // 2 second delay on notification popup
                 } else {
                     alert('Failed to process dropped files.');
                 }
             });
         }
+
+        // Manage Games Modal Logic
+        const manageGamesBtn = document.getElementById('manageGamesBtn');
+        const manageGamesModal = document.getElementById('manageGamesModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const installedGamesListContainer = document.getElementById('installedGamesListContainer');
+
+        async function loadInstalledGamesList() {
+            installedGamesListContainer.innerHTML = '<div class="no-games">Loading...</div>';
+            try {
+                const games = await window.electronAPI.getInstalledGames();
+                if (!games || games.length === 0) {
+                    installedGamesListContainer.innerHTML = '<div class="no-games">No added games found in Steam path.</div>';
+                    return;
+                }
+
+                let html = '';
+                games.forEach(appId => {
+                    html += `
+                        <div class="game-list-item">
+                            <span>App ID: ${appId}</span>
+                            <button class="btn-remove-game" data-appid="${appId}">Remove</button>
+                        </div>
+                    `;
+                });
+                installedGamesListContainer.innerHTML = html;
+
+                // Attach remove handlers
+                document.querySelectorAll('.btn-remove-game').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const targetId = e.target.getAttribute('data-appid');
+                        if (confirm(`Are you sure you want to remove App ID ${targetId}?`)) {
+                            const res = await window.electronAPI.removeGame(targetId);
+                            if (res.success) {
+                                loadInstalledGamesList();
+                            } else {
+                                alert('Failed to remove game files.');
+                            }
+                        }
+                    });
+                });
+            } catch (err) {
+                installedGamesListContainer.innerHTML = '<div class="no-games">Error loading installed games. Check Steam path configuration.</div>';
+            }
+        }
+
+        if (manageGamesBtn) {
+            manageGamesBtn.addEventListener('click', () => {
+                manageGamesModal.classList.add('open');
+                loadInstalledGamesList();
+            });
+        }
+
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', () => {
+                manageGamesModal.classList.remove('open');
+            });
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target === manageGamesModal) {
+                manageGamesModal.classList.remove('open');
+            }
+        });
     </script>
 
     <script src="renderer.js"></script>
@@ -345,4 +460,3 @@
     <script src="help.js"></script>
 </body>
 </html>
-```[cite: 6]
