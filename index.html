@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Additional styling for the Manage Games Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center;
@@ -332,6 +331,53 @@
                             <p>Steam Injector lets you browse Steam, spot a game's App ID automatically, and add it to Steam with one click. This short tour covers everything in 5 quick steps.</p>
                         </div>
                     </article>
+                    <article class="help-step" data-step="1">
+                        <div class="stage s-path">
+                            <div class="path-box"><span>steam.exe</span></div>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 1 of 4</span>
+                            <h3>Configure Steam Path</h3>
+                            <p>Make sure Steam Injector knows where your Steam installation folder is located. Click <strong>Auto Detect</strong> or use <strong>Browse</strong> to select the folder containing <code>steam.exe</code>.</p>
+                        </div>
+                    </article>
+                    <article class="help-step" data-step="2">
+                        <div class="stage s-browse">
+                            <div class="browser-mockup">
+                                <div class="bm-bar"><i></i><i></i><i></i></div>
+                                <div class="bm-body">
+                                    <div class="bm-line l1"></div>
+                                    <div class="bm-line l2"></div>
+                                    <div class="bm-badge">App ID: 123450</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 2 of 4</span>
+                            <h3>Browse Steam &amp; SteamDB</h3>
+                            <p>Use the built-in browser panel to navigate to Steam Store or SteamDB. The app automatically detects any game's App ID as you browse.</p>
+                        </div>
+                    </article>
+                    <article class="help-step" data-step="3">
+                        <div class="stage s-add">
+                            <div class="mock-btn primary">Add to Steam</div>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 3 of 4</span>
+                            <h3>Click 'Add to Steam'</h3>
+                            <p>Once an App ID is recognized, the <strong>Add to Steam</strong> button becomes active. Click it to fetch and install the required manifest and plugin files automatically.</p>
+                        </div>
+                    </article>
+                    <article class="help-step" data-step="4">
+                        <div class="stage s-restart">
+                            <div class="mock-btn restart">Restart Steam</div>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 4 of 4</span>
+                            <h3>Restart Steam</h3>
+                            <p>After adding your games, click <strong>Restart Steam</strong> to apply changes. Your added items will now appear properly in your Steam library!</p>
+                        </div>
+                    </article>
                 </div>
 
                 <div class="help-footer">
@@ -343,10 +389,27 @@
                 </div>
                 <div class="help-progress"><div id="helpProgress"></div></div>
             </section>
+
+            <section class="help-pane" data-pane="faq">
+                <div class="faq-list">
+                    <details class="faq-item">
+                        <summary>App ID isn't detecting automatically?</summary>
+                        <p>Try refreshing the page or navigating directly to the game's official store page or SteamDB entry. You can also manually drag and drop custom files into the designated drop zone.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Where do the files get installed?</label>
+                        <p>Files are securely placed into your configured Steam installation directory under <code>depotcache</code> and <code>config/stplug-in</code>.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary>What if server downloads fail?</summary>
+                        <p>The app will automatically generate local template files using the standard template definitions so you can proceed without interruption.</p>
+                    </details>
+                </div>
+            </section>
         </div>
     </div>
 
-    <!-- Script handlers for Drag & Drop and Manage Games Modal -->
+    <!-- Script handlers -->
     <script>
         const dropZone = document.getElementById('dropZone');
         if (dropZone) {
@@ -383,7 +446,7 @@
                 if (res.success) {
                     setTimeout(() => {
                         alert(`Successfully installed ${res.count} dropped file(s) into Steam directories!`);
-                    }, 2000); // 2 second delay on notification popup
+                    }, 2000);
                 } else {
                     alert('Failed to process dropped files.');
                 }
@@ -401,7 +464,7 @@
             try {
                 const games = await window.electronAPI.getInstalledGames();
                 if (!games || games.length === 0) {
-                    installedGamesListContainer.innerHTML = '<div class="no-games">No added games found in Steam path.</div>';
+                    installedGamesListContainer.innerHTML = '<div class="no-games">No added games found via Steam Injector.</div>';
                     return;
                 }
 
@@ -416,7 +479,6 @@
                 });
                 installedGamesListContainer.innerHTML = html;
 
-                // Attach remove handlers
                 document.querySelectorAll('.btn-remove-game').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                         const targetId = e.target.getAttribute('data-appid');
@@ -431,7 +493,7 @@
                     });
                 });
             } catch (err) {
-                installedGamesListContainer.innerHTML = '<div class="no-games">Error loading installed games. Check Steam path configuration.</div>';
+                installedGamesListContainer.innerHTML = '<div class="no-games">Error loading added games. Check Steam path configuration.</div>';
             }
         }
 
