@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam Injector</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+
+                       
+
+
+                    <div class="brand">
+                        <h1 class="title">Steam Injector</h1>
+                        <span class="tagline">Add games to Steam in a few clicks</span>
+                    </div>
+                    <span class="version">v3.0 (beta)</span>
+                </div>
+                <div class="header-controls">
+                    <!-- Kept (hidden) so the existing script can still find it; English only -->
+                    <select id="languageSelect" class="language-selector" hidden>
+                        <option value="en" selected>English</option>
+                    </select>
+                    <div class="help-wrap">
+                        <button id="helpBtn" class="help-btn attention" type="button" aria-haspopup="dialog" aria-controls="helpOverlay">
+                            <span class="help-btn-icon">?</span>
+                            <span class="help-btn-text">Help</span>
+                        </button>
+                        <div id="helpTip" class="help-tip" role="status">New here? Take the 1-minute tour</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="config-section card">
+                    <h2 class="section-title" data-i18n="config">Configuration</h2>
+                    <div class="config-info">
+                        <div class="info-item">
+                            <span class="label" data-i18n="steam_path">Steam Path</span>
+                            <span id="steamPathDisplay" class="value truncate" data-i18n="steam_not_configured">Not configured</span>
+                        </div>
+                        <div class="button-group">
+                            <button id="detectSteamBtn" class="btn btn-secondary btn-detect" data-i18n="detect_steam">
+                                Auto Detect
+                            </button>
+                            <button id="selectSteamBtn" class="btn btn-secondary btn-browse" data-i18n="select_steam">
+                                Browse
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="status-section card">
+                    <h2 class="section-title" data-i18n="status">Status</h2>
+                    <div class="status-info">
+                        <div class="status-item">
+                            <span class="label">Steam</span>
+                            <div class="status-indicator-wrapper">
+                                <span class="status-dot" id="steamStatus"></span>
+                                <span id="steamStatusText" data-i18n="steam_offline">Offline</span>
+                            </div>
+                        </div>
+                        <div class="status-item">
+                            <span class="label" data-i18n="app_id">App ID</span>
+                            <span id="appIdDisplay" class="app-id">—</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions-section card">
+                    <h2 class="section-title" data-i18n="actions">Actions</h2>
+                    <div class="button-group vertical">
+                        <button id="addToSteamBtn" class="btn btn-primary btn-add" disabled data-i18n="add_to_steam">
+                            Add to Steam
+                        </button>
+                        <button id="restartSteamBtn" class="btn btn-danger btn-restart" data-i18n="restart_steam">
+                            Restart Steam
+                        </button>
+                    </div>
+                </div>
+
+                <div class="gamepad-indicator card" id="gamepadIndicator">
+                    <div class="gamepad-icon-wrapper">
+                        <svg class="gamepad-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 12h4m2 0h4m-7 3h4m-2-6h.01M6 9h.01M18 9h.01M18 12h.01"></path>
+                            <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                        </svg>
+                    </div>
+                    <span data-i18n="gamepad_connected">Controller Connected</span>
+                </div>
+            </aside>
+
+            <!-- Browser Panel -->
+            <div class="browser-panel">
+                <div class="browser-toolbar">
+                    <div class="nav-buttons">
+                        <button id="backBtn" class="nav-btn" title="Back">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <button id="forwardBtn" class="nav-btn" title="Forward">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                        <button id="refreshBtn" class="nav-btn" title="Refresh">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <polyline points="1 20 1 14 7 14"></polyline>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                            </svg>
+                        </button>
+                        <button id="homeBtn" class="nav-btn" title="Home">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="url-bar">
+                        <input type="text" id="urlInput" readonly class="url-input" placeholder="https://store.steampowered.com">
+                    </div>
+                    <select id="siteSelector" class="site-selector">
+                        <option value="https://store.steampowered.com">Steam Store</option>
+                        <option value="https://steamdb.info" selected>SteamDB</option>
+                    </select>
+                </div>
+                <div class="browser-content">
+                    <webview id="webview"
+                             src="https://steamdb.info"
+                             useragent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                             partition="persist:steaminjector"></webview>
+                </div>
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-info">
+                        <span id="progressText" data-i18n="downloading">Downloading...</span>
+                        <span id="progressPercent" class="progress-percent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions Footer -->
+        <footer class="footer">
+            <p class="instructions" data-i18n="instructions">
+                Navigate to a Steam game → App ID detected automatically → Click 'Add to Steam' → Restart Steam - Made by Ezziex
+            </p>
+        </footer>
+    </div>
+
+    <!-- Help dialog -->
+    <div id="helpOverlay" class="help-overlay" aria-hidden="true">
+        <div class="help-modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+            <button id="helpClose" class="help-close" type="button" aria-label="Close help">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+
+            <div class="help-header">
+                <h2 id="helpTitle">Help Center</h2>
+                <div class="help-tabs" role="tablist">
+                    <button class="help-tab active" type="button" role="tab" data-tab="guide">Quick start</button>
+                    <button class="help-tab" type="button" role="tab" data-tab="faq">Tips &amp; FAQ</button>
+                </div>
+            </div>
+
+            <!-- Guide -->
+            <section class="help-pane active" data-pane="guide">
+                <div class="help-steps">
+
+                    <!-- 0 Welcome -->
+                    <article class="help-step active" data-step="0">
+                        <div class="stage s-welcome">
+                            <div class="orbit o1"><i></i></div>
+                            <div class="orbit o2"><i></i></div>
+                            <div class="orbit o3"><i></i></div>
+                            <div class="w-logo">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                            </div>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Welcome</span>
+                            <h3>Let's get you started</h3>
+                            <p>Steam Injector lets you browse Steam, spot a game's App ID automatically, and add it to Steam with one click. This short tour covers everything in 5 quick steps.</p>
+                        </div>
+                    </article>
+
+                    <!-- 1 Configure -->
+                    <article class="help-step" data-step="1">
+                        <div class="stage s-config">
+                            <div class="c-card">
+                                <div class="c-label">STEAM PATH</div>
+                                <div class="c-path"><span class="c-type">C:\Program Files (x86)\Steam</span></div>
+                                <div class="c-btns"><b class="c-b1">Auto Detect</b><b>Browse</b></div>
+                                <div class="c-mag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+                                <div class="c-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+                            </div>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 1</span>
+                            <h3>Tell it where Steam lives</h3>
+                            <p>In <b>Configuration</b>, click <b>Auto Detect</b> and the app will look for your Steam folder. If it can't find it, click <b>Browse</b> and pick the folder yourself. The path appears in the box once it's set.</p>
+                        </div>
+                    </article>
+
+                    <!-- 2 Browse -->
+                    <article class="help-step" data-step="2">
+                        <div class="stage s-browse">
+                            <div class="b-win">
+                                <div class="b-bar"><span></span><span></span><span></span><em>store.steampowered.com</em></div>
+                                <div class="b-grid">
+                                    <div class="b-tile"></div>
+                                    <div class="b-tile b-pick"></div>
+                                    <div class="b-tile"></div>
+                                </div>
+                            </div>
+                            <svg class="b-cursor" viewBox="0 0 24 24"><path d="M4 3l16 7-7 2-2 7z" fill="#fff" stroke="#0b1020" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 2</span>
+                            <h3>Open a game's page</h3>
+                            <p>Use the built-in browser on the right. Pick <b>Steam Store</b> or <b>SteamDB</b> from the dropdown, search for a game and open its page. The back, forward, refresh and home buttons work just like a normal browser.</p>
+                        </div>
+                    </article>
+
+                    <!-- 3 App ID -->
+                    <article class="help-step" data-step="3">
+                        <div class="stage s-appid">
+                            <div class="a-ring r1"></div><div class="a-ring r2"></div>
+                            <div class="a-card">
+                                <div class="a-row"><span class="a-lab">STEAM</span><span class="a-pill"><i></i>Online</span></div>
+                                <div class="a-row"><span class="a-lab">APP ID</span><span class="a-id">730</span></div>
+                            </div>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 3</span>
+                            <h3>The App ID shows up by itself</h3>
+                            <p>As soon as you're on a game page, its <b>App ID</b> appears in the <b>Status</b> card, and the <b>Add to Steam</b> button switches on. The <b>Steam</b> light turns green when Steam is running.</p>
+                        </div>
+                    </article>
+
+                    <!-- 4 Add -->
+                    <article class="help-step" data-step="4">
+                        <div class="stage s-add">
+                            <div class="d-btn">Add to Steam</div>
+                            <div class="d-ripple"></div>
+                            <div class="d-prog"><div class="d-fill"></div></div>
+                            <div class="d-done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg><span>Added!</span></div>
+                            <svg class="d-cursor" viewBox="0 0 24 24"><path d="M4 3l16 7-7 2-2 7z" fill="#fff" stroke="#0b1020" stroke-width="1.5" stroke-linejoin="round"/></svg>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 4</span>
+                            <h3>Click “Add to Steam”</h3>
+                            <p>Press <b>Add to Steam</b> in the <b>Actions</b> card. A progress bar slides up at the bottom of the browser while it works. Wait for it to finish before moving on.</p>
+                        </div>
+                    </article>
+
+                    <!-- 5 Restart -->
+                    <article class="help-step" data-step="5">
+                        <div class="stage s-restart">
+                            <div class="r-wrap">
+                                <div class="r-ring"></div>
+                                <svg class="r-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5"/></svg>
+                                <svg class="r-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+                            </div>
+                            <div class="r-confetti"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 5</span>
+                            <h3>Restart Steam — you're done!</h3>
+                            <p>Click <b>Restart Steam</b> so it picks up the change. When Steam reopens, the game will be there. Repeat from step 2 any time you want to add another one.</p>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="help-footer">
+                    <div class="help-dots" id="helpDots"></div>
+                    <div class="help-nav">
+                        <button id="helpPrev" class="btn btn-secondary" type="button">Back</button>
+                        <button id="helpNext" class="btn btn-primary" type="button">Next</button>
+                    </div>
+                </div>
+                <div class="help-progress"><div id="helpProgress"></div></div>
+            </section>
+
+            <!-- FAQ -->
+            <section class="help-pane" data-pane="faq">
+                <div class="faq">
+                    <details open>
+                        <summary>“Add to Steam” is greyed out</summary>
+                        <p>It turns on once an App ID is detected. Open a specific game's page (not the home or search page) in the browser panel and check that an ID appears in the <b>Status</b> card.</p>
+                    </details>
+                    <details>
+                        <summary>Steam isn't detected</summary>
+                        <p>Click <b>Browse</b> and choose your Steam install folder, the one that contains the Steam program itself. Then check the Steam light in <b>Status</b>.</p>
+                    </details>
+                    <details>
+                        <summary>The game isn't in my library yet</summary>
+                        <p>Use <b>Restart Steam</b>. Steam only picks up changes when it starts, so it needs a fresh launch.</p>
+                        <p>If the game does not show <b>Restart Steam</b>. in some cases all games randomly get removed just restart steam and your good to go</p>
+                    </details>
+                    <details>
+                        <summary>What steam account should I use and will i get banned</summary>
+                        <p>We recomend using a alt account <b>But you may still get banned</b>. Steam does not always ban and bans are very rare.</p>
+                    </details>
+                    <details>
+                        <summary>Do all steam games work</summary>
+                        <p>99% of games can be added <b>But</b>. Some games will require you to login with there provider (E.g ubisoft) This will not work</p>
+			<p> we are working to fix this</p>
+                    </details>
+                    <details>
+                        <summary>Do i need to have steamtools</summary>
+                        <p>Some users say that installing steam tools in the past gets this to work <b>But other say this is not true</b>.</p>
+			<p> we are working to fix this</p>
+                    </details>
+                    <details>
+                        <summary>Can I use a controller?</summary>
+                        <p>Yes. Plug one in and a green <b>Controller Connected</b> badge appears at the bottom of the sidebar.</p>
+                    </details>
+                    <details>
+                        <summary>Steam Store or SteamDB?</summary>
+                        <p>Either one works. Pick whichever you prefer from the dropdown in the browser toolbar; the App ID is read from the game's page on both.</p>
+                    </details>
+                    <details>
+                        <summary>How do i update</summary>
+                        <p>I am trying to update frequently but check out the github for updates!</p>
+                    </details>
+                    <div class="shortcuts">
+                        <span><kbd>?</kbd> open help</span>
+                        <span><kbd>←</kbd><kbd>→</kbd> change step</span>
+                        <span><kbd>Esc</kbd> close</span>
+                        <span>                                       Made by - Ezziex</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+    <script src="gamepad.js"></script>
+    <script src="help.js"></script>
+</body>
+</html>
