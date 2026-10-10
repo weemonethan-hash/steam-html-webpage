@@ -440,6 +440,64 @@
         </div>
     </div>
 
+
+<!-- Inside <div class="actions-section card"> of index.html -->
+<div class="actions-section card">
+    <h2 class="section-title" data-i18n="actions">Actions</h2>
+    <div class="button-group vertical">
+        <button id="addToSteamBtn" class="btn btn-primary btn-add" disabled data-i18n="add_to_steam">
+            Add to Steam
+        </button>
+        <button id="restartSteamBtn" class="btn btn-danger btn-restart" data-i18n="restart_steam">
+            Restart Steam
+        </button>
+    </div>
+
+    <!-- Drag and Drop Zone for Manual Files -->
+    <div id="dropZone" class="drop-zone" style="border: 2px dashed var(--border-light); padding: 10px; text-align: center; border-radius: var(--radius-sm); margin-top: 10px; cursor: pointer;">
+        <p style="font-size: 0.72rem; color: var(--text-secondary);">Drop .manifest or .lua files here</p>
+    </div>
+</div>
+
+<script>
+    // Drag and Drop & Template Fallback Event Listeners
+    const dropZone = document.getElementById('dropZone');
+    if (dropZone) {
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--accent)';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = 'var(--border-light)';
+        });
+
+        dropZone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border-light)';
+
+            const appId = document.getElementById('appIdDisplay').textContent;
+            if (!appId || appId === '—') {
+                alert('Please select a valid game/App ID first!');
+                return;
+            }
+
+            const filesData = [];
+            for (const f of e.dataTransfer.files) {
+                const arrayBuffer = await f.arrayBuffer();
+                filesData.push({ name: f.name, data: Array.from(new Uint8Array(arrayBuffer)) });
+            }
+
+            const res = await window.electronAPI.installDroppedFiles({ appId, files: filesData });
+            if (res.success) {
+                alert(`Successfully installed ${res.count} dropped file(s)!`);
+            } else {
+                alert('Failed to install dropped files.');
+            }
+        });
+    }
+</script>
+
     <script src="renderer.js"></script>
     <script src="gamepad.js"></script>
     <script src="help.js"></script>
