@@ -7,6 +7,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles-new.css" id="uiNewCss">
+    <link rel="stylesheet" href="settings.css">
+    <script src="ui.js"></script>
     <style>
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -141,7 +144,9 @@
                     <select id="languageSelect" class="language-selector" hidden>
                         <option value="en" selected>English</option>
                     </select>
-                    
+                    <button id="settingsBtn" class="settings-btn" type="button" title="Settings" aria-label="Open settings" aria-haspopup="dialog">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </button>
                 </div>
             </div>
         </header>
@@ -293,6 +298,44 @@
         </div>
     </div>
 
+    <!-- Settings dialog -->
+    <div id="settingsOverlay" class="settings-overlay" aria-hidden="true">
+        <div class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+            <button id="settingsClose" class="settings-close" type="button" aria-label="Close settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+            <h2 id="settingsTitle">Settings</h2>
+            <fieldset class="settings-group">
+                <legend>Interface</legend>
+                <p class="settings-hint">Changes apply right away and are remembered next time you open the app.</p>
+                <div class="ui-options">
+                    <label class="ui-option">
+                        <input type="radio" name="uiMode" value="new" checked>
+                        <span class="ui-option-body">
+                            <span class="ui-thumb is-new" aria-hidden="true">
+                                <span class="strip"><i class="hot"></i><i></i><i></i></span>
+                                <i class="web"></i>
+                            </span>
+                            <span class="ui-option-name">New</span>
+                            <span class="ui-option-desc">Controls in a bar above the browser, so the page gets the full width.</span>
+                        </span>
+                    </label>
+                    <label class="ui-option">
+                        <input type="radio" name="uiMode" value="legacy">
+                        <span class="ui-option-body">
+                            <span class="ui-thumb is-legacy" aria-hidden="true">
+                                <span class="side"><i></i><i></i><i class="hot"></i></span>
+                                <i class="web"></i>
+                            </span>
+                            <span class="ui-option-name">Legacy</span>
+                            <span class="ui-option-desc">The previous look, with controls in a sidebar beside the browser.</span>
+                        </span>
+                    </label>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
     <!-- Help dialog -->
     <div id="helpOverlay" class="help-overlay" aria-hidden="true">
         <div class="help-modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
@@ -409,17 +452,20 @@
         if (dropZone) {
             dropZone.addEventListener('dragover', (e) => {
                 e.preventDefault();
+                dropZone.classList.add('dragover');
                 dropZone.style.borderColor = '#6366f1';
                 dropZone.style.background = 'rgba(99, 102, 241, 0.1)';
             });
 
             dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
                 dropZone.style.borderColor = '#4f46e5';
                 dropZone.style.background = 'rgba(79, 70, 229, 0.05)';
             });
 
             dropZone.addEventListener('drop', async (e) => {
                 e.preventDefault();
+                dropZone.classList.remove('dragover');
                 dropZone.style.borderColor = '#4f46e5';
                 dropZone.style.background = 'rgba(79, 70, 229, 0.05)';
 
