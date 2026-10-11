@@ -147,7 +147,7 @@
                         <div class="info-item" style="margin-top: 12px;">
                             <span class="label">Target Account</span>
                             <select id="accountSelect" class="site-selector" style="width: 100%; margin-top: 4px;">
-                                <option value="">Loading accounts...</option>
+                                <option value="">Configure Steam Path first</option>
                             </select>
                         </div>
                     </div>
@@ -416,20 +416,28 @@
     <script>
         const dropZone = document.getElementById('dropZone');
 
-        // Load Steam accounts into dropdown on startup
+        // Load Steam accounts into dropdown safely
         async function loadSteamAccounts() {
+            const selectElement = document.getElementById('accountSelect');
+            if (!selectElement) return;
+
             try {
+                if (!window.electronAPI || typeof window.electronAPI.invoke !== 'function') {
+                    selectElement.innerHTML = '<option value="">API bridge not loaded</option>';
+                    return;
+                }
+
                 const accounts = await window.electronAPI.invoke('get-steam-accounts');
-                const selectElement = document.getElementById('accountSelect');
-                if (!selectElement) return;
                 selectElement.innerHTML = '';
+
                 if (!accounts || accounts.length === 0) {
                     const opt = document.createElement('option');
                     opt.value = '';
-                    opt.textContent = 'No accounts found';
+                    opt.textContent = 'Configure Steam Path first';
                     selectElement.appendChild(opt);
                     return;
                 }
+
                 accounts.forEach(acc => {
                     const option = document.createElement('option');
                     option.value = acc.steamId;
@@ -439,9 +447,21 @@
                 });
             } catch (e) {
                 console.error('Failed to load accounts', e);
+                selectElement.innerHTML = '<option value="">Error loading accounts</option>';
             }
         }
+
         window.addEventListener('DOMContentLoaded', loadSteamAccounts);
+
+        // Reload accounts when Auto Detect or Browse sets the path
+        ['detectSteamBtn', 'selectSteamBtn'].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                btn.addEventListener('click', () => {
+                    setTimeout(loadSteamAccounts, 1500);
+                });
+            }
+        });
 
         function focusWebview() {
             const wv = document.getElementById('webview');
