@@ -1,0 +1,133 @@
+/* "Manage Added Games" dialog. Uses the active interface's colour tokens,
+   so it matches both the New and Legacy looks. */
+
+body.modal-open webview { visibility: hidden; }
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: 1.5rem;
+    background: rgba(3, 6, 10, 0.72);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+.modal-content {
+    width: min(520px, 100%);
+    max-height: min(640px, 100%);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--text-primary);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1rem 0.9rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { margin: 0; font-family: var(--display); font-size: 1.05rem; color: var(--text-primary); }
+.manage-count {
+    min-width: 1.6rem;
+    padding: 0.05rem 0.5rem;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+}
+.manage-count[hidden] { display: none; }
+.modal-header .manage-spacer { flex: 1; }
+.modal-close {
+    width: 32px; height: 32px;
+    display: grid; place-items: center;
+    padding: 0;
+    font-size: 1.3rem;
+    line-height: 1;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+.modal-close:hover { color: var(--text-primary); background: var(--bg-tertiary); border-color: var(--border-light); }
+
+.manage-toolbar {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+}
+.manage-toolbar[hidden] { display: none; }
+.manage-search {
+    flex: 1;
+    min-width: 0;
+    padding: 0.45rem 0.7rem;
+    font: inherit;
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+}
+.manage-search::placeholder { color: var(--text-tertiary); }
+
+.modal-body { padding: 0.75rem 1.25rem 1.1rem; overflow-y: auto; flex: 1 1 auto; min-height: 120px; }
+
+.game-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.game-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 46px;
+    margin: 0;
+    padding: 0.45rem 0.6rem 0.45rem 0.85rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+.game-id { font-family: var(--mono); font-size: 0.88rem; color: var(--text-primary); }
+.game-id-label { color: var(--text-tertiary); }
+.game-id strong { font-weight: 600; }
+.game-actions { display: flex; align-items: center; gap: 0.35rem; }
+.game-state { font-size: 0.78rem; color: var(--text-secondary); margin-right: 0.15rem; }
+
+.manage-btn, .btn-remove-game {
+    padding: 0.32rem 0.7rem;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.manage-btn { color: var(--text-primary); background: transparent; border: 1px solid var(--border-light); }
+.manage-btn:hover { background: var(--bg-card); border-color: var(--text-tertiary); }
+.btn-remove-game { color: var(--accent-danger); background: transparent; border: 1px solid rgba(255, 93, 108, 0.5); }
+.btn-remove-game:hover { color: #1c0805; background: var(--accent-danger); border-color: var(--accent-danger); }
+
+.manage-btn:focus-visible, .btn-remove-game:focus-visible, .modal-close:focus-visible,
+.manage-search:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.no-games { padding: 1.5rem 0.5rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem; }
+.no-games p { margin: 0 0 0.8rem; }
+.no-games p:last-child { margin-bottom: 0; }
+
+.visually-hidden {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}

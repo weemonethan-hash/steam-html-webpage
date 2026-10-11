@@ -325,24 +325,6 @@ html.ui-new {
 .ui-new .footer { padding: 0.35rem 1rem; background: var(--bg-secondary); }
 .ui-new .instructions { font-size: 0.74rem; letter-spacing: 0; }
 
-/* ───────── Manage-games dialog (its base styles live in index.html) ───────── */
-.ui-new .modal-overlay { background: rgba(3, 6, 8, 0.72); }
-.ui-new .modal-content {
-    background: var(--bg-card);
-    border-color: var(--border-light);
-    border-radius: var(--radius);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-}
-.ui-new .modal-header { border-bottom-color: var(--border); }
-.ui-new .modal-header h3 { font-family: var(--display); font-size: 1.05rem; color: var(--text-primary); }
-.ui-new .modal-close { color: var(--text-secondary); }
-.ui-new .modal-close:hover { color: var(--text-primary); }
-.ui-new .game-list-item { background: var(--bg-tertiary); border-radius: var(--radius-sm); }
-.ui-new .game-list-item span { font-family: var(--mono); font-size: 0.85rem; color: var(--text-primary); }
-.ui-new .btn-remove-game { background: transparent; color: var(--accent-danger); border: 1px solid rgba(236, 106, 94, 0.5); border-radius: var(--radius-sm); }
-.ui-new .btn-remove-game:hover { background: var(--accent-danger); color: #1c0805; }
-.ui-new .no-games { color: var(--text-tertiary); }
-
 /* Toasts are styled inline by renderer.js, hence !important */
 .ui-new .notification {
     top: 64px !important;

@@ -10,33 +10,7 @@
     <link rel="stylesheet" href="styles-new.css" id="uiNewCss">
     <link rel="stylesheet" href="settings.css">
     <script src="ui.js"></script>
-    <style>
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center;
-            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
-        }
-        .modal-overlay.open { opacity: 1; pointer-events: auto; }
-        .modal-content {
-            background: #1e1e2f; border: 1px solid #33334d; width: 500px; max-height: 80vh;
-            border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-        .modal-header { padding: 16px 20px; border-bottom: 1px solid #33334d; display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h3 { margin: 0; color: #fff; font-size: 1.1rem; }
-        .modal-close { background: none; border: none; color: #a1a1aa; font-size: 1.2rem; cursor: pointer; }
-        .modal-body { padding: 20px; overflow-y: auto; flex-grow: 1; }
-        .game-list-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: #27273f; padding: 10px 14px; border-radius: 6px; margin-bottom: 8px;
-        }
-        .game-list-item span { color: #fff; font-family: monospace; font-size: 0.9rem; }
-        .btn-remove-game {
-            background: #ef4444; color: #fff; border: none; padding: 6px 12px;
-            border-radius: 4px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s;
-        }
-        .btn-remove-game:hover { background: #dc2626; }
-        .no-games { text-align: center; color: #8888a0; font-size: 0.9rem; margin-top: 20px; }
-    </style>
+    <link rel="stylesheet" href="manage-games.css">
 </head>
 <body>
     <!-- Loading screen -->
@@ -286,15 +260,22 @@
     </div>
 
     <!-- Manage Games Modal -->
-    <div id="manageGamesModal" class="modal-overlay">
-        <div class="modal-content">
+    <div id="manageGamesModal" class="modal-overlay" aria-hidden="true">
+        <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="manageTitle">
             <div class="modal-header">
-                <h3>Manage Added Games</h3>
-                <button id="closeModalBtn" class="modal-close">&times;</button>
+                <h3 id="manageTitle">Manage Added Games</h3>
+                <span id="manageCount" class="manage-count" hidden></span>
+                <span class="manage-spacer"></span>
+                <button id="closeModalBtn" class="modal-close" type="button" aria-label="Close">&times;</button>
+            </div>
+            <div class="manage-toolbar" hidden>
+                <input id="manageSearch" class="manage-search" type="search" placeholder="Search by App ID" aria-label="Search by App ID" autocomplete="off">
+                <button id="manageRefresh" class="manage-btn" type="button">Refresh</button>
             </div>
             <div class="modal-body" id="installedGamesListContainer">
-                <div class="no-games">Loading installed games...</div>
+                <div class="no-games"><p>Loading added games…</p></div>
             </div>
+            <div id="manageLive" class="visually-hidden" role="status" aria-live="polite"></div>
         </div>
     </div>
 
@@ -492,73 +473,11 @@
                 }
             });
         }
-
-        // Manage Games Modal Logic
-        const manageGamesBtn = document.getElementById('manageGamesBtn');
-        const manageGamesModal = document.getElementById('manageGamesModal');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const installedGamesListContainer = document.getElementById('installedGamesListContainer');
-
-        async function loadInstalledGamesList() {
-            installedGamesListContainer.innerHTML = '<div class="no-games">Loading...</div>';
-            try {
-                const games = await window.electronAPI.getInstalledGames();
-                if (!games || games.length === 0) {
-                    installedGamesListContainer.innerHTML = '<div class="no-games">No added games found via Steam Injector.</div>';
-                    return;
-                }
-
-                let html = '';
-                games.forEach(appId => {
-                    html += `
-                        <div class="game-list-item">
-                            <span>App ID: ${appId}</span>
-                            <button class="btn-remove-game" data-appid="${appId}">Remove</button>
-                        </div>
-                    `;
-                });
-                installedGamesListContainer.innerHTML = html;
-
-                document.querySelectorAll('.btn-remove-game').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
-                        const targetId = e.target.getAttribute('data-appid');
-                        if (confirm(`Are you sure you want to remove App ID ${targetId}?`)) {
-                            const res = await window.electronAPI.removeGame(targetId);
-                            if (res.success) {
-                                loadInstalledGamesList();
-                            } else {
-                                alert('Failed to remove game files.');
-                            }
-                        }
-                    });
-                });
-            } catch (err) {
-                installedGamesListContainer.innerHTML = '<div class="no-games">Error loading added games. Check Steam path configuration.</div>';
-            }
-        }
-
-        if (manageGamesBtn) {
-            manageGamesBtn.addEventListener('click', () => {
-                manageGamesModal.classList.add('open');
-                loadInstalledGamesList();
-            });
-        }
-
-        if (closeModalBtn) {
-            closeModalBtn.addEventListener('click', () => {
-                manageGamesModal.classList.remove('open');
-            });
-        }
-
-        window.addEventListener('click', (e) => {
-            if (e.target === manageGamesModal) {
-                manageGamesModal.classList.remove('open');
-            }
-        });
     </script>
 
     <script src="renderer.js"></script>
     <script src="gamepad.js"></script>
     <script src="help.js"></script>
+    <script src="manage-games.js"></script>
 </body>
 </html>
