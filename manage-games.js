@@ -76,7 +76,7 @@
 
         if (status === 'loading') { body.appendChild(message('Loading added games…')); return; }
         if (status === 'error') {
-            body.appendChild(message('Could not read your added games. Check the Steam path in Configuration, then try again.', 'Try again', load));
+            body.appendChild(message('Could not read your added games. Check the Steam path in Configuration, then try again. Make sure you have the newest update', 'Try again', load));
             return;
         }
         if (!games.length) {
