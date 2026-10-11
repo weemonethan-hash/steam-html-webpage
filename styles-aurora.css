@@ -1,0 +1,705 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+/* ═════════════════════════════════════════════════════════════════════
+   Steam Injector — "Aurora" interface
+
+   Loaded after styles.css and active only while <html> has the
+   .ui-aurora class (see ui.js). Every rule is scoped to .ui-aurora, so
+   choosing another interface in Settings brings that look back exactly
+   as it was. No markup ids or app logic depend on this file.
+
+   Idea: a calm, glassy workspace floating over a slow-moving aurora.
+   Frosted panels, one gradient accent (violet → cyan), soft light that
+   follows the cursor, and motion that is quick, eased and purposeful.
+   ═════════════════════════════════════════════════════════════════════ */
+
+/* ───────── Tokens ───────── */
+html.ui-aurora {
+    color-scheme: dark;
+    --bg-primary: #07061a;
+    --bg-secondary: #0d0b24;
+    --bg-tertiary: #1b1840;
+    --bg-card: rgba(24, 21, 54, 0.58);
+    --glass: rgba(255, 255, 255, 0.045);
+    --glass-strong: rgba(255, 255, 255, 0.08);
+    --accent: #a392ff;
+    --accent-2: #36d6c6;
+    --accent-3: #f472b6;
+    --accent-hover: #bbb0ff;
+    --accent-soft: rgba(163, 146, 255, 0.5);
+    --accent-danger: #fb7185;
+    --accent-danger-hover: #f43f5e;
+    --on-accent: #0a0824;
+    --text-primary: #f3f1ff;
+    --text-secondary: #bcb8dc;
+    --text-tertiary: #8f8bb6;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-light: rgba(255, 255, 255, 0.17);
+    --success: #6ee7a8;
+    --warning: #fbbf24;
+    --radius: 18px;
+    --radius-sm: 11px;
+    --shadow: 0 18px 50px rgba(3, 2, 20, 0.55);
+    --glow: 0 0 0 1px rgba(163, 146, 255, 0.35), 0 10px 40px rgba(110, 90, 255, 0.28);
+    --display: 'Sora', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+    --grad: linear-gradient(120deg, #a392ff 0%, #5fb3ff 52%, #36d6c6 100%);
+    --grad-warm: linear-gradient(120deg, #f472b6 0%, #a392ff 100%);
+    background: var(--bg-primary);
+}
+
+.ui-aurora body {
+    font-family: 'Plus Jakarta Sans', 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
+    background: transparent;
+    line-height: 1.5;
+    position: relative;
+}
+
+/* Aurora: three slow blobs of colour + a whisper of grain, behind everything */
+.ui-aurora body::before {
+    content: '';
+    position: fixed;
+    inset: -20%;
+    z-index: -2;
+    pointer-events: none;
+    background:
+        radial-gradient(38% 34% at 18% 22%, rgba(124, 92, 255, 0.34), transparent 70%),
+        radial-gradient(34% 32% at 82% 18%, rgba(54, 214, 198, 0.22), transparent 70%),
+        radial-gradient(40% 38% at 70% 88%, rgba(244, 114, 182, 0.2), transparent 70%),
+        radial-gradient(30% 30% at 8% 92%, rgba(56, 130, 255, 0.2), transparent 70%);
+    filter: blur(24px) saturate(1.15);
+    animation: auroraDrift 26s ease-in-out infinite alternate;
+}
+.ui-aurora body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+@keyframes auroraDrift {
+    0%   { transform: translate3d(-2%, -1%, 0) rotate(0deg) scale(1); }
+    50%  { transform: translate3d(3%, 2%, 0) rotate(4deg) scale(1.08); }
+    100% { transform: translate3d(-1%, 3%, 0) rotate(-3deg) scale(1.02); }
+}
+
+.ui-aurora ::selection { background: rgba(163, 146, 255, 0.45); color: #fff; }
+
+/* ───────── Frame ───────── */
+.ui-aurora .container {
+    gap: 12px;
+    padding: 14px;
+}
+
+/* ───────── Header ───────── */
+.ui-aurora .header {
+    flex: none;
+    padding: 0.55rem 0.7rem 0.55rem 0.8rem;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(22px) saturate(1.4);
+    -webkit-backdrop-filter: blur(22px) saturate(1.4);
+}
+.ui-aurora .header::after {
+    inset: auto 24px -1px 24px;
+    left: 24px; right: 24px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent-2), transparent);
+    opacity: 0.6;
+}
+.ui-aurora .logo-section { gap: 0.8rem; }
+
+.ui-aurora .logo-icon {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    box-shadow: 0 0 0 1px var(--border-light), 0 6px 22px rgba(124, 92, 255, 0.4);
+    transition: transform 0.5s var(--spring), box-shadow 0.3s;
+}
+.ui-aurora .logo-icon::before {
+    /* a slowly turning halo behind the logo */
+    content: '';
+    position: absolute;
+    inset: -3px;
+    z-index: -1;
+    border-radius: 15px;
+    background: conic-gradient(from 0deg, var(--accent), var(--accent-2), var(--accent-3), var(--accent));
+    filter: blur(8px);
+    opacity: 0.55;
+    animation: haloSpin 9s linear infinite;
+}
+.ui-aurora .logo-icon:hover { transform: rotate(-6deg) scale(1.08); }
+.ui-aurora .logo-icon img { border-radius: 12px; }
+@keyframes haloSpin { to { transform: rotate(360deg); } }
+
+.ui-aurora .title {
+    font-size: 1.12rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(100deg, #fff 0%, #d9d3ff 45%, #a8f0e6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.ui-aurora .tagline { font-size: 0.72rem; color: var(--text-tertiary); letter-spacing: 0.01em; }
+
+.ui-aurora .version {
+    position: relative;
+    overflow: hidden;
+    padding: 0.14rem 0.6rem;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    font-weight: 600 !important;
+    letter-spacing: 0.02em;
+    color: var(--accent-hover);
+    background: rgba(163, 146, 255, 0.12);
+    border: 1px solid rgba(163, 146, 255, 0.35);
+    border-radius: 999px;
+}
+.ui-aurora .version::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+    transform: translateX(-120%);
+    animation: shimmer 5s ease-in-out 1.5s infinite;
+}
+@keyframes shimmer { 0%, 60% { transform: translateX(-120%); } 100% { transform: translateX(120%); } }
+
+.ui-aurora .settings-btn {
+    background: var(--glass);
+    border-color: var(--border);
+    border-radius: 12px;
+    transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.25s;
+}
+.ui-aurora .settings-btn svg { transition: transform 0.6s var(--spring); }
+.ui-aurora .settings-btn:hover { background: var(--glass-strong); box-shadow: 0 0 22px rgba(163, 146, 255, 0.35); }
+.ui-aurora .settings-btn:hover svg { transform: rotate(120deg); }
+
+/* ───────── Layout ───────── */
+.ui-aurora .main-content { gap: 12px; overflow: visible; min-height: 0; }
+
+.ui-aurora .sidebar {
+    width: 316px;
+    flex: none;
+    gap: 12px;
+    padding: 2px 6px 2px 2px;
+    margin: -2px -6px -2px -2px;
+    background: transparent;
+    border: none;
+}
+.ui-aurora .sidebar::-webkit-scrollbar { width: 4px; }
+.ui-aurora .sidebar::-webkit-scrollbar-thumb { background: var(--border-light); }
+
+/* Frosted cards with a light that follows the cursor (--mx/--my set in ui.js) */
+.ui-aurora .card {
+    flex: none;
+    --mx: 50%;
+    --my: 0%;
+    overflow: hidden;
+    padding: 0.9rem 1rem 1rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 55%),
+        var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 30px rgba(3, 2, 20, 0.35);
+    backdrop-filter: blur(20px) saturate(1.35);
+    -webkit-backdrop-filter: blur(20px) saturate(1.35);
+    transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease), translate 0.3s var(--ease);
+}
+.ui-aurora .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(240px circle at var(--mx) var(--my), rgba(163, 146, 255, 0.2), transparent 70%);
+    transition: opacity 0.35s;
+}
+.ui-aurora .card:hover {
+    translate: 0 -2px;
+    border-color: rgba(163, 146, 255, 0.4);
+    box-shadow: 0 16px 44px rgba(3, 2, 20, 0.5), 0 0 0 1px rgba(163, 146, 255, 0.12);
+}
+.ui-aurora .card:hover::after { opacity: 1; }
+
+.ui-aurora .section-title {
+    margin-bottom: 0.7rem;
+    font-size: 0.86rem;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+.ui-aurora .sidebar > .card:not(.gamepad-indicator) .section-title::before {
+    width: 22px;
+    height: 22px;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    box-shadow: 0 4px 14px rgba(124, 92, 255, 0.45);
+}
+
+/* Configuration */
+.ui-aurora .info-item { margin-bottom: 0.65rem; gap: 0.3rem; }
+.ui-aurora .label { color: var(--text-tertiary); font-size: 0.74rem; font-weight: 600; }
+.ui-aurora .value {
+    font-size: 0.74rem;
+    padding: 0.5rem 0.7rem;
+    color: var(--text-secondary);
+    background: rgba(5, 4, 20, 0.55);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+}
+
+/* Status — the App ID is the readout */
+.ui-aurora .status-info {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+.ui-aurora .status-item:nth-child(2) {
+    order: -1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+    min-width: 0;
+}
+.ui-aurora .status-item:first-child {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.35rem;
+}
+.ui-aurora .status-item:nth-child(2) .label { font-size: 0.72rem; }
+.ui-aurora .app-id {
+    display: inline-block;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    font-size: 2.1rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+    font-variant-numeric: tabular-nums;
+    background: var(--grad);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: idShift 7s ease-in-out infinite alternate;
+}
+.ui-aurora .app-id.pop { animation: idPop 0.7s var(--spring), idShift 7s ease-in-out infinite alternate; }
+@keyframes idShift { from { background-position: 0% 0; } to { background-position: 100% 0; } }
+@keyframes idPop {
+    0%   { transform: translateY(8px) scale(0.92); opacity: 0; filter: blur(6px); }
+    60%  { filter: blur(0); }
+    100% { transform: none; opacity: 1; }
+}
+/* no game picked yet: the readout rests */
+.ui-aurora .sidebar:has(.btn-add:disabled) .app-id {
+    background: none;
+    -webkit-text-fill-color: var(--text-tertiary);
+    color: var(--text-tertiary);
+    animation: none;
+}
+
+.ui-aurora .status-indicator-wrapper {
+    background: rgba(5, 4, 20, 0.5);
+    border-color: var(--border);
+}
+.ui-aurora .status-dot { position: relative; box-shadow: 0 0 8px rgba(251, 113, 133, 0.7); }
+.ui-aurora .status-dot.online { box-shadow: 0 0 10px var(--success); animation: none; }
+.ui-aurora .status-dot.online::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid var(--success);
+    animation: dotRing 2s ease-out infinite;
+}
+@keyframes dotRing { from { transform: scale(0.6); opacity: 0.9; } to { transform: scale(1.9); opacity: 0; } }
+
+/* ───────── Buttons ───────── */
+.ui-aurora .btn {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding: 0.62rem 1rem;
+    border-radius: 12px;
+    font-size: 0.84rem;
+    transition: transform 0.25s var(--spring), box-shadow 0.3s, background 0.25s, border-color 0.25s, color 0.25s, opacity 0.2s;
+}
+.ui-aurora .btn:focus-visible,
+.ui-aurora .nav-btn:focus-visible,
+.ui-aurora .settings-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+/* light sweep on hover */
+.ui-aurora .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.28) 50%, transparent 65%);
+    transform: translateX(-130%);
+    transition: transform 0.7s var(--ease);
+}
+.ui-aurora .btn:hover:not(:disabled)::after { transform: translateX(130%); }
+
+.ui-aurora .btn-primary {
+    background: var(--grad);
+    background-size: 160% 100%;
+    background-position: 0% 0;
+    color: var(--on-accent);
+    box-shadow: 0 8px 26px rgba(110, 90, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.ui-aurora .btn-primary:hover:not(:disabled) {
+    filter: none;
+    background-position: 100% 0;
+    transform: translateY(-2px);
+    box-shadow: 0 14px 34px rgba(110, 90, 255, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.ui-aurora .btn:active:not(:disabled) { transform: translateY(0) scale(0.97); }
+.ui-aurora .btn-primary:disabled {
+    background: var(--glass);
+    color: var(--text-tertiary);
+    border-color: var(--border);
+    box-shadow: none;
+    opacity: 0.75;
+}
+.ui-aurora .btn-add { padding: 0.78rem 1rem; font-size: 0.92rem; }
+.ui-aurora .btn-add:not(:disabled) { animation: addReady 3s ease-in-out infinite; }
+@keyframes addReady {
+    0%, 100% { box-shadow: 0 8px 26px rgba(110, 90, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+    50%      { box-shadow: 0 8px 36px rgba(54, 214, 198, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35); }
+}
+
+.ui-aurora .btn-secondary {
+    background: var(--glass);
+    color: var(--text-primary);
+    border-color: var(--border-light);
+}
+.ui-aurora .btn-secondary:hover:not(:disabled) {
+    background: var(--glass-strong);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba(110, 90, 255, 0.25);
+}
+.ui-aurora .btn-danger {
+    background: rgba(251, 113, 133, 0.08);
+    color: var(--accent-danger);
+    border-color: rgba(251, 113, 133, 0.4);
+}
+.ui-aurora .btn-danger:hover:not(:disabled) {
+    background: var(--accent-danger);
+    color: #2a0610;
+    border-color: var(--accent-danger);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 26px rgba(251, 113, 133, 0.4);
+}
+
+/* click ripple (spawned by ui.js) */
+.ui-aurora .btn .ripple {
+    position: absolute;
+    z-index: -1;
+    width: 12px;
+    height: 12px;
+    margin: -6px 0 0 -6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+    animation: ripple 0.65s var(--ease) forwards;
+}
+@keyframes ripple { to { transform: scale(30); opacity: 0; } }
+
+.ui-aurora .actions-section .button-group.vertical {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+.ui-aurora .actions-section .btn-add { grid-column: 1 / -1; }
+.ui-aurora .actions-section .button-group .btn { margin-top: 0 !important; }
+
+/* Drop zone — inline styles in the markup, hence !important */
+.ui-aurora #dropZone {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 0.7rem !important;
+    padding: 0.8rem 0.8rem !important;
+    border: 1.5px dashed rgba(163, 146, 255, 0.45) !important;
+    border-radius: 14px !important;
+    background: rgba(163, 146, 255, 0.05) !important;
+    transition: border-color 0.25s, background 0.25s, transform 0.35s var(--spring), box-shadow 0.3s !important;
+}
+.ui-aurora #dropZone svg {
+    width: 26px; height: 26px;
+    stroke: var(--accent) !important;
+    margin-bottom: 5px !important;
+    animation: dropFloat 3s ease-in-out infinite;
+}
+.ui-aurora #dropZone p:first-of-type { font-size: 0.8rem !important; font-weight: 600 !important; color: var(--text-primary) !important; }
+.ui-aurora #dropZone p:last-of-type { font-size: 0.7rem !important; color: var(--text-tertiary) !important; }
+.ui-aurora #dropZone:hover {
+    border-color: var(--accent-2) !important;
+    background: rgba(54, 214, 198, 0.07) !important;
+    transform: translateY(-2px);
+}
+.ui-aurora #dropZone:hover svg { stroke: var(--accent-2) !important; }
+.ui-aurora #dropZone.dragover {
+    border-color: var(--accent-2) !important;
+    background: rgba(54, 214, 198, 0.12) !important;
+    transform: scale(1.025);
+    box-shadow: 0 0 0 4px rgba(54, 214, 198, 0.15), 0 0 40px rgba(54, 214, 198, 0.25);
+}
+.ui-aurora #dropZone.dragover svg { stroke: var(--accent-2) !important; animation: dropBounce 0.6s ease-in-out infinite; }
+@keyframes dropFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes dropBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+/* Controller badge */
+.ui-aurora .gamepad-indicator {
+    padding: 0.8rem 1rem;
+    color: var(--success);
+    background: rgba(110, 231, 168, 0.1);
+    border: 1px solid rgba(110, 231, 168, 0.4);
+    box-shadow: 0 0 30px rgba(110, 231, 168, 0.15);
+}
+.ui-aurora .gamepad-icon { color: var(--success); }
+
+/* ───────── Browser ───────── */
+.ui-aurora .browser-panel {
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    backdrop-filter: blur(22px) saturate(1.3);
+    -webkit-backdrop-filter: blur(22px) saturate(1.3);
+}
+
+.ui-aurora .browser-toolbar {
+    gap: 0.6rem;
+    padding: 0.55rem 0.7rem;
+    background: transparent;
+    border-bottom: 1px solid var(--border);
+}
+.ui-aurora .browser-toolbar::after {
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent-2), transparent) 0 0 / 40% 100% no-repeat;
+}
+
+.ui-aurora .nav-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    transition: background 0.2s, color 0.2s, transform 0.25s var(--spring), border-color 0.2s;
+}
+.ui-aurora .nav-btn:hover { background: var(--glass-strong); border-color: var(--border-light); color: var(--accent-hover); transform: translateY(-1px); }
+.ui-aurora .nav-btn:active { transform: scale(0.9); }
+
+.ui-aurora .url-input {
+    padding: 0.52rem 1rem;
+    font-size: 0.74rem;
+    color: var(--text-secondary);
+    background: rgba(5, 4, 20, 0.55);
+    border-color: var(--border);
+    border-radius: 999px;
+    transition: border-color 0.25s, background 0.25s, box-shadow 0.25s;
+}
+.ui-aurora .url-input:focus { border-color: var(--accent); background: rgba(5, 4, 20, 0.75); box-shadow: 0 0 0 3px rgba(163, 146, 255, 0.2); }
+
+.ui-aurora .site-selector {
+    padding: 0.5rem 0.75rem;
+    min-width: 128px;
+    font-size: 0.8rem;
+    color: var(--text-primary);
+    background: var(--glass);
+    border-color: var(--border-light);
+    border-radius: 999px;
+    transition: border-color 0.25s, background 0.25s;
+}
+.ui-aurora .site-selector:hover,
+.ui-aurora .site-selector:focus { background: var(--glass-strong); border-color: var(--accent); }
+.ui-aurora .site-selector option { background: #12102e; color: var(--text-primary); }
+
+.ui-aurora .browser-content {
+    margin: 0 10px 10px;
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    background: rgba(5, 4, 20, 0.6);
+    box-shadow: 0 10px 40px rgba(3, 2, 20, 0.5);
+}
+
+.ui-aurora .progress-container {
+    left: 1.2rem; right: 1.2rem; bottom: 1.2rem;
+    padding: 0.85rem 1.1rem;
+    background: rgba(13, 11, 36, 0.82);
+    border-color: var(--border-light);
+    border-radius: 14px;
+    animation: toastUp 0.45s var(--spring);
+}
+@keyframes toastUp { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: none; } }
+.ui-aurora .progress-percent { color: var(--accent-2); }
+.ui-aurora .progress-bar { height: 5px; background: rgba(255, 255, 255, 0.08); }
+.ui-aurora .progress-fill {
+    position: relative;
+    background: var(--grad);
+    box-shadow: 0 0 14px rgba(110, 160, 255, 0.7);
+    overflow: hidden;
+}
+.ui-aurora .progress-fill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.55) 50%, transparent 80%);
+    transform: translateX(-100%);
+    animation: fillSheen 1.4s linear infinite;
+}
+@keyframes fillSheen { to { transform: translateX(100%); } }
+
+/* ───────── Footer ───────── */
+.ui-aurora .footer {
+    flex: none;
+    padding: 0 1rem;
+    background: transparent;
+    border: none;
+}
+.ui-aurora .instructions { font-size: 0.72rem; color: var(--text-tertiary); letter-spacing: 0.01em; }
+
+/* ───────── Toasts (styled inline by renderer.js, hence !important) ───────── */
+.ui-aurora .notification {
+    top: 84px !important;
+    right: 26px !important;
+    padding: 0.8rem 1.1rem !important;
+    border-radius: 14px !important;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-primary) !important;
+    background: rgba(24, 21, 54, 0.82) !important;
+    border: 1px solid var(--border-light);
+    border-left: 3px solid var(--accent);
+    box-shadow: 0 18px 50px rgba(3, 2, 20, 0.6) !important;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+}
+.ui-aurora .notification-success { border-left-color: var(--success); }
+.ui-aurora .notification-error { border-left-color: var(--accent-danger); }
+
+/* ───────── Dialogs ───────── */
+.ui-aurora .settings-overlay,
+.ui-aurora .help-overlay {
+    background: rgba(5, 4, 22, 0.62);
+    backdrop-filter: blur(14px) saturate(1.2);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+.ui-aurora .settings-modal,
+.ui-aurora .help-modal {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 35%),
+        rgba(20, 17, 48, 0.9);
+    border: 1px solid var(--border-light);
+    border-radius: 24px;
+    box-shadow: 0 40px 100px rgba(3, 2, 20, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+}
+.ui-aurora .help-modal::before { height: 3px; background: var(--grad); }
+.ui-aurora .settings-modal::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    border-radius: 24px 24px 0 0;
+    background: var(--grad);
+}
+.ui-aurora .help-header h2,
+.ui-aurora .settings-modal h2 { font-family: var(--display); font-size: 1.1rem; }
+.ui-aurora .step-text h3 { font-family: var(--display); font-size: 1.4rem; }
+.ui-aurora .help-tabs { background: rgba(5, 4, 20, 0.55); }
+.ui-aurora .help-tab.active { box-shadow: 0 4px 16px rgba(110, 90, 255, 0.45); }
+.ui-aurora .help-close:hover { color: #2a0610; transform: rotate(90deg); }
+.ui-aurora .step-kicker { color: var(--accent-hover); background: rgba(163, 146, 255, 0.12); border-color: rgba(163, 146, 255, 0.35); }
+.ui-aurora .help-dot.done { background: rgba(163, 146, 255, 0.6); }
+.ui-aurora .faq details { background: rgba(5, 4, 20, 0.45); }
+.ui-aurora .faq details[open] { background: rgba(163, 146, 255, 0.07); border-color: rgba(163, 146, 255, 0.3); }
+.ui-aurora .stage {
+    background:
+        radial-gradient(circle at 50% 50%, rgba(163, 146, 255, 0.16), transparent 60%),
+        linear-gradient(var(--border) 1px, transparent 1px) 0 0 / 28px 28px,
+        linear-gradient(90deg, var(--border) 1px, transparent 1px) 0 0 / 28px 28px,
+        rgba(5, 4, 20, 0.6);
+}
+
+/* ───────── Loading screen ───────── */
+.ui-aurora .splash {
+    background:
+        radial-gradient(40% 40% at 30% 30%, rgba(124, 92, 255, 0.3), transparent 70%),
+        radial-gradient(36% 36% at 72% 66%, rgba(54, 214, 198, 0.2), transparent 70%),
+        var(--bg-primary);
+}
+.ui-aurora .splash::before { background: radial-gradient(circle at 50% 50%, transparent 35%, var(--bg-primary) 90%); }
+.ui-aurora .sp-arc { stroke: url(#auroraStroke); filter: drop-shadow(0 0 8px rgba(163, 146, 255, 0.7)); }
+.ui-aurora .sp-ticks2 { stroke: var(--accent-2); }
+.ui-aurora .sp-bolt-dim { fill: rgba(163, 146, 255, 0.1); }
+.ui-aurora .sp-bolt-fill { filter: drop-shadow(0 0 10px rgba(163, 146, 255, 0.9)); }
+.ui-aurora .sp-steam i { background: radial-gradient(circle, rgba(190, 180, 255, 0.55), rgba(190, 180, 255, 0) 70%); }
+.ui-aurora .sp-word { font-weight: 700; letter-spacing: -0.02em; }
+.ui-aurora .sp-bar i { box-shadow: 0 0 14px rgba(110, 160, 255, 0.7); }
+
+/* ───────── Entrance (starts once ui.js adds .aur-ready, i.e. after the splash) ───────── */
+html.ui-aurora:not(.aur-ready) .header,
+html.ui-aurora:not(.aur-ready) .sidebar > .card:not(.gamepad-indicator),
+html.ui-aurora:not(.aur-ready) .browser-panel,
+html.ui-aurora:not(.aur-ready) .footer { opacity: 0; }
+
+html.ui-aurora.aur-ready body .header { animation: auraDown 0.75s var(--ease) both; }
+html.ui-aurora.aur-ready body .sidebar > .card:not(.gamepad-indicator) { animation: auraLeft 0.75s var(--ease) var(--d, 0.1s) both; }
+html.ui-aurora.aur-ready body .sidebar > .card:nth-child(1) { --d: 0.12s; }
+html.ui-aurora.aur-ready body .sidebar > .card:nth-child(2) { --d: 0.22s; }
+html.ui-aurora.aur-ready body .sidebar > .card:nth-child(3) { --d: 0.32s; }
+html.ui-aurora.aur-ready body .browser-panel { animation: auraUp 0.85s var(--ease) 0.2s both; }
+html.ui-aurora.aur-ready body .footer { animation: auraFade 0.9s ease 0.6s both; }
+@keyframes auraDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
+@keyframes auraLeft { from { opacity: 0; transform: translateX(-22px); } to { opacity: 1; transform: none; } }
+@keyframes auraUp   { from { opacity: 0; transform: translateY(22px) scale(0.985); } to { opacity: 1; transform: none; } }
+@keyframes auraFade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ───────── Narrow windows ───────── */
+@media (max-width: 1100px) {
+    .ui-aurora .tagline { display: none; }
+    .ui-aurora .sidebar { width: 280px; }
+    .ui-aurora .actions-section .button-group .btn { padding-left: 0.4rem; padding-right: 0.4rem; font-size: 0.78rem; gap: 0.35rem; }
+}
+@media (max-width: 860px) {
+    .ui-aurora .container { padding: 8px; gap: 8px; }
+    .ui-aurora .sidebar { width: 236px; }
+    .ui-aurora .app-id { font-size: 1.7rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ui-aurora body::before,
+    .ui-aurora .logo-icon::before,
+    .ui-aurora .version::after,
+    .ui-aurora .app-id,
+    .ui-aurora .btn-add,
+    .ui-aurora #dropZone svg,
+    .ui-aurora .status-dot.online::after,
+    .ui-aurora .progress-fill::after { animation: none !important; }
+    html.ui-aurora:not(.aur-ready) .header,
+    html.ui-aurora:not(.aur-ready) .sidebar > .card,
+    html.ui-aurora:not(.aur-ready) .browser-panel,
+    html.ui-aurora:not(.aur-ready) .footer { opacity: 1; }
+    html.ui-aurora.aur-ready body .header,
+    html.ui-aurora.aur-ready body .sidebar > .card,
+    html.ui-aurora.aur-ready body .browser-panel,
+    html.ui-aurora.aur-ready body .footer { animation: none; }
+    .ui-aurora .btn::after { display: none; }
+}
