@@ -45,60 +45,167 @@
             </div>
         </div>
     </div>
-    <script>
+<script>
+    const dropZone = document.getElementById('dropZone');
+
+    // Global function so renderer.js can also trigger it safely
+    window.loadSteamAccounts = async function() {
+        const selectElement = document.getElementById('accountSelect');
+        if (!selectElement) return;
+
+        try {
+            if (!window.electronAPI || typeof window.electronAPI.invoke !== 'function') {
+                return;
+            }
+
+            const accounts = await window.electronAPI.invoke('get-steam-accounts');
+            
+            // If main.js returns valid accounts, build the list
+            if (accounts && Array.isArray(accounts) && accounts.length > 0) {
+                // Prevent wiping if it's already filled with the exact same items
+                const existingCount = selectElement.options.length;
+                if (existingCount === accounts.length && selectElement.value !== '') {
+                    return; 
+                }
+
+                selectElement.innerHTML = '';
+                accounts.forEach(acc => {
+                    const option = document.createElement('option');
+                    option.value = acc.steamId;
+                    option.textContent = `${acc.accountName} (${acc.steamId})${acc.mostRecent ? ' [Active]' : ''}`;
+                    if (acc.mostRecent) option.selected = true;
+                    selectElement.appendChild(option);
+                });
+            } else {
+                selectElement.innerHTML = '<option value="">Configure Steam Path first</option>';
+            }
+        } catch (e) {
+            console.error('Failed to load accounts:', e);
+            selectElement.innerHTML = '<option value="">Error loading accounts</option>';
+        }
+    };
+
+    // Run when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(window.loadSteamAccounts, 200);
+    });
+
+    // Reload accounts when Auto Detect or Browse sets the path
+    ['detectSteamBtn', 'selectSteamBtn'].forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.addEventListener('click', () => {
+                setTimeout(window.loadSteamAccounts, 1500);
+            });
+        }
+    });
+
+    function focusWebview() {
+        const wv = document.getElementById('webview');
+        if (!wv) return;
+        try {
+            if (document.activeElement !== wv) wv.focus();
+            if (typeof wv.focus === 'function') wv.focus();
+        } catch (e) {}
+    }
+
+    const nativeAlert = window.alert.bind(window);
+    window.alert = function (msg) {
+        nativeAlert(msg);
+        setTimeout(() => {
+            window.focus();
+            focusWebview();
+        }, 50);
+    };
+
+    if (dropZone) {
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+            dropZone.style.borderColor = '#6366f1';
+            dropZone.style.background = 'rgba(99, 102, 241, 0.1)';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+            dropZone.style.borderColor = '#4f46e5';
+            dropZone.style.background = 'rgba(79, 70, 229, 0.05)';
+        });
+
+        dropZone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            dropZone.style.borderColor = '#4f46e5';
+            dropZone.style.background = 'rgba(79, 70, 229, 0.05)';
+
+            const appIdElem = document.getElementById('appIdDisplay');
+            const appId = appIdElem ? appIdElem.textContent : null;
+            if (!appId || appId === '—') {
+                alert('Please select a valid game/App ID first!');
+                return;
+            }
+
+            const targetAccount = document.getElementById('accountSelect') ? document.getElementById('accountSelect').value : null;
+
+            const filesData = [];
+            for (const f of e.dataTransfer.files) {
+                const arrayBuffer = await f.arrayBuffer();
+                filesData.push({ name: f.name, data: Array.from(new Uint8Array(arrayBuffer)) });
+            }
+
+            const res = await window.electronAPI.invoke('install-dropped-files', { appId, files: filesData, targetAccount });
+            if (res && res.success) {
+                setTimeout(() => {
+                    alert(`Successfully installed ${res.count} dropped file(s) into Steam directories!`);
+                }, 500);
+            } else {
+                alert('Failed to process dropped files.');
+            }
+        });
+    }
+
+    const GENERATE_URL = 'https://openlua.cloud/';
+    const generateBtn = document.getElementById('generateBtn');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', () => {
+            const wv = document.getElementById('webview');
+            if (!wv) return;
+            try {
+                if (typeof wv.loadURL === 'function') {
+                    wv.loadURL(GENERATE_URL).catch(() => {});
+                } else {
+                    wv.src = GENERATE_URL;
+                }
+            } catch (e) {
+                wv.src = GENERATE_URL;
+            }
+            const urlInput = document.getElementById('urlInput');
+            if (urlInput) urlInput.value = GENERATE_URL;
+            setTimeout(focusWebview, 100);
+        });
+    }
+
     (function () {
-        var splash = document.getElementById('splash');
-        var word = document.getElementById('spWord');
-        var statusEl = document.getElementById('spStatus');
-        var pctEl = document.getElementById('spPct');
-        if (!splash) return;
-
-        var text = word.textContent; word.textContent = '';
-        for (var i = 0; i < text.length; i++) {
-            var s = document.createElement('span');
-            s.style.setProperty('--i', i);
-            if (text[i] === ' ') { s.className = 'sp-gap'; } else { s.textContent = text[i]; }
-            word.appendChild(s);
+        const wv = document.getElementById('webview');
+        if (!wv) return;
+        ['dom-ready', 'did-finish-load', 'did-navigate', 'did-navigate-in-page'].forEach((ev) => {
+            wv.addEventListener(ev, () => setTimeout(focusWebview, 50));
+        });
+        window.addEventListener('focus', () => setTimeout(focusWebview, 0));
+        const content = document.querySelector('.browser-content');
+        if (content) {
+            content.addEventListener('mousedown', focusWebview);
+            content.addEventListener('mouseenter', () => {
+                if (document.activeElement && /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+                focusWebview();
+            });
         }
-
-        var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-        var DURATION = reduce ? 600 : 2600;
-        var msgs = [[0, 'Warming up the injector'], [0.34, 'Loading the Steam browser'], [0.68, 'Getting everything ready'], [0.97, 'Ready']];
-        var msgIdx = 0, loaded = document.readyState === 'complete', finished = false, t0 = null;
-
-        window.addEventListener('load', function () { loaded = true; });
-
-        function setMsg(txt) {
-            statusEl.classList.add('swap');
-            setTimeout(function () { statusEl.textContent = txt; statusEl.classList.remove('swap'); }, 160);
-        }
-        function ease(t) { return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
-
-        function leave() {
-            if (finished) return; finished = true;
-            splash.classList.add('full');
-            setTimeout(function () {
-                splash.classList.add('done');
-                document.body.classList.add('ready');
-                setTimeout(function () { if (splash.parentNode) splash.parentNode.removeChild(splash); }, 900);
-            }, reduce ? 0 : 450);
-        }
-
-        function frame(ts) {
-            if (t0 === null) t0 = ts;
-            var raw = Math.min(1, (ts - t0) / DURATION);
-            var p = ease(raw);
-            if (!loaded && p > 0.92) p = 0.92;
-            splash.style.setProperty('--p', p.toFixed(4));
-            pctEl.textContent = Math.round(p * 100) + '%';
-            while (msgIdx + 1 < msgs.length && p >= msgs[msgIdx + 1][0]) { msgIdx++; setMsg(msgs[msgIdx][1]); }
-            if (raw >= 1 && loaded) { splash.style.setProperty('--p', 1); pctEl.textContent = '100%'; leave(); return; }
-            requestAnimationFrame(frame);
-        }
-        requestAnimationFrame(frame);
-        setTimeout(leave, 8000);
+        ['backBtn', 'forwardBtn', 'refreshBtn', 'homeBtn', 'siteSelector'].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener(id === 'siteSelector' ? 'change' : 'click', () => setTimeout(focusWebview, 100));
+        });
     })();
-    </script>
+</script>
     <div class="container">
         <!-- Header -->
         <header class="header">
