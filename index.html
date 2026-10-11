@@ -170,6 +170,9 @@
                         <button id="addToSteamBtn" class="btn btn-primary btn-add" disabled data-i18n="add_to_steam">
                             Add to Steam
                         </button>
+                        <button id="generateBtn" class="btn btn-secondary btn-generate" type="button" style="margin-top: 6px;">
+                            Generate
+                        </button>
                         <button id="manageGamesBtn" class="btn btn-secondary" style="margin-top: 6px;">
                             Manage Added Games
                         </button>
@@ -415,7 +418,7 @@
                         <p>Try refreshing the page or navigating directly to the game's official store page or SteamDB entry. You can also manually drag and drop custom files into the designated drop zone.</p>
                     </details>
                     <details class="faq-item">
-                        <summary>Where do the files get installed?</label>
+                        <summary>Where do the files get installed?</summary>
                         <p>Files are securely placed into your configured Steam installation directory under <code>depotcache</code> and <code>config/stplug-in</code>.</p>
                     </details>
                     <details class="faq-item">
@@ -430,6 +433,30 @@
     <!-- Script handlers -->
     <script>
         const dropZone = document.getElementById('dropZone');
+
+        // Give keyboard focus back to the embedded browser. Electron <webview>
+        // can lose keyboard focus after alert() dialogs, window blur/refocus,
+        // or clicks on app controls, which makes SteamDB inputs untypable.
+        function focusWebview() {
+            const wv = document.getElementById('webview');
+            if (!wv) return;
+            try {
+                if (document.activeElement !== wv) wv.focus();
+                if (typeof wv.focus === 'function') wv.focus();
+            } catch (e) { /* webview not ready yet */ }
+        }
+
+        // alert() blocks the renderer and is the main cause of lost typing focus,
+        // so restore focus to the webview every time one is dismissed.
+        const nativeAlert = window.alert.bind(window);
+        window.alert = function (msg) {
+            nativeAlert(msg);
+            setTimeout(() => {
+                window.focus();
+                focusWebview();
+            }, 50);
+        };
+
         if (dropZone) {
             dropZone.addEventListener('dragover', (e) => {
                 e.preventDefault();
@@ -473,6 +500,56 @@
                 }
             });
         }
+
+        // Generate button: opens https://fares.top/ in the built-in browser.
+        // The button lives in the Actions group, which is shown by both the
+        // New and Legacy interfaces.
+        const GENERATE_URL = 'https://fares.top/';
+        const generateBtn = document.getElementById('generateBtn');
+        if (generateBtn) {
+            generateBtn.addEventListener('click', () => {
+                const wv = document.getElementById('webview');
+                if (!wv) return;
+                try {
+                    if (typeof wv.loadURL === 'function') {
+                        wv.loadURL(GENERATE_URL).catch(() => {});
+                    } else {
+                        wv.src = GENERATE_URL;
+                    }
+                } catch (e) {
+                    wv.src = GENERATE_URL;
+                }
+                const urlInput = document.getElementById('urlInput');
+                if (urlInput) urlInput.value = GENERATE_URL;
+                setTimeout(focusWebview, 100);
+            });
+        }
+
+        // Typing-bug fix: keep the webview focusable and re-focus it at the
+        // moments focus is normally lost.
+        (function () {
+            const wv = document.getElementById('webview');
+            if (!wv) return;
+            ['dom-ready', 'did-finish-load', 'did-navigate', 'did-navigate-in-page'].forEach((ev) => {
+                wv.addEventListener(ev, () => setTimeout(focusWebview, 50));
+            });
+            // Window regains focus (alt-tab, dialog closed) -> focus the page again.
+            window.addEventListener('focus', () => setTimeout(focusWebview, 0));
+            // Clicking anywhere in the browser area re-focuses the page.
+            const content = document.querySelector('.browser-content');
+            if (content) {
+                content.addEventListener('mousedown', focusWebview);
+                content.addEventListener('mouseenter', () => {
+                    if (document.activeElement && /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+                    focusWebview();
+                });
+            }
+            // After using toolbar buttons / site selector, hand focus back.
+            ['backBtn', 'forwardBtn', 'refreshBtn', 'homeBtn', 'siteSelector'].forEach((id) => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener(id === 'siteSelector' ? 'change' : 'click', () => setTimeout(focusWebview, 100));
+            });
+        })();
     </script>
 
     <script src="renderer.js"></script>
