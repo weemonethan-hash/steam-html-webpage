@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Additional styling for the Manage Games Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center;
@@ -16,7 +15,7 @@
         }
         .modal-overlay.open { opacity: 1; pointer-events: auto; }
         .modal-content {
-            background: #1e1e2f; border: 1px solid #33334d; width: 520px; max-height: 80vh;
+            background: #1e1e2f; border: 1px solid #33334d; width: 500px; max-height: 80vh;
             border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
         .modal-header { padding: 16px 20px; border-bottom: 1px solid #33334d; display: flex; justify-content: space-between; align-items: center; }
@@ -25,8 +24,9 @@
         .modal-body { padding: 20px; overflow-y: auto; flex-grow: 1; }
         .game-list-item {
             display: flex; justify-content: space-between; align-items: center;
-            background: #27273f; padding: 12px 16px; border-radius: 6px; margin-bottom: 8px;
+            background: #27273f; padding: 10px 14px; border-radius: 6px; margin-bottom: 8px;
         }
+        .game-list-item span { color: #fff; font-family: monospace; font-size: 0.9rem; }
         .btn-remove-game {
             background: #ef4444; color: #fff; border: none; padding: 6px 12px;
             border-radius: 4px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s;
@@ -141,13 +141,7 @@
                     <select id="languageSelect" class="language-selector" hidden>
                         <option value="en" selected>English</option>
                     </select>
-                    <div class="help-wrap">
-                        <button id="helpBtn" class="help-btn attention" type="button" aria-haspopup="dialog" aria-controls="helpOverlay">
-                            <span class="help-btn-icon">?</span>
-                            <span class="help-btn-text">Help</span>
-                        </button>
-                        <div id="helpTip" class="help-tip" role="status">New here? Take the 1-minute tour</div>
-                    </div>
+                    
                 </div>
             </div>
         </header>
@@ -331,6 +325,53 @@
                             <p>Steam Injector lets you browse Steam, spot a game's App ID automatically, and add it to Steam with one click. This short tour covers everything in 5 quick steps.</p>
                         </div>
                     </article>
+                    <article class="help-step" data-step="1">
+                        <div class="stage s-path">
+                            <div class="path-box"><span>steam.exe</span></div>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 1 of 4</span>
+                            <h3>Configure Steam Path</h3>
+                            <p>Make sure Steam Injector knows where your Steam installation folder is located. Click <strong>Auto Detect</strong> or use <strong>Browse</strong> to select the folder containing <code>steam.exe</code>.</p>
+                        </div>
+                    </article>
+                    <article class="help-step" data-step="2">
+                        <div class="stage s-browse">
+                            <div class="browser-mockup">
+                                <div class="bm-bar"><i></i><i></i><i></i></div>
+                                <div class="bm-body">
+                                    <div class="bm-line l1"></div>
+                                    <div class="bm-line l2"></div>
+                                    <div class="bm-badge">App ID: 123450</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 2 of 4</span>
+                            <h3>Browse Steam &amp; SteamDB</h3>
+                            <p>Use the built-in browser panel to navigate to Steam Store or SteamDB. The app automatically detects any game's App ID as you browse.</p>
+                        </div>
+                    </article>
+                    <article class="help-step" data-step="3">
+                        <div class="stage s-add">
+                            <div class="mock-btn primary">Add to Steam</div>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 3 of 4</span>
+                            <h3>Click 'Add to Steam'</h3>
+                            <p>Once an App ID is recognized, the <strong>Add to Steam</strong> button becomes active. Click it to fetch and install the required manifest and plugin files automatically.</p>
+                        </div>
+                    </article>
+                    <article class="help-step" data-step="4">
+                        <div class="stage s-restart">
+                            <div class="mock-btn restart">Restart Steam</div>
+                        </div>
+                        <div class="step-text">
+                            <span class="step-kicker">Step 4 of 4</span>
+                            <h3>Restart Steam</h3>
+                            <p>After adding your games, click <strong>Restart Steam</strong> to apply changes. Your added items will now appear properly in your Steam library!</p>
+                        </div>
+                    </article>
                 </div>
 
                 <div class="help-footer">
@@ -342,76 +383,28 @@
                 </div>
                 <div class="help-progress"><div id="helpProgress"></div></div>
             </section>
+
+            <section class="help-pane" data-pane="faq">
+                <div class="faq-list">
+                    <details class="faq-item">
+                        <summary>App ID isn't detecting automatically?</summary>
+                        <p>Try refreshing the page or navigating directly to the game's official store page or SteamDB entry. You can also manually drag and drop custom files into the designated drop zone.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary>Where do the files get installed?</label>
+                        <p>Files are securely placed into your configured Steam installation directory under <code>depotcache</code> and <code>config/stplug-in</code>.</p>
+                    </details>
+                    <details class="faq-item">
+                        <summary>What if server downloads fail?</summary>
+                        <p>The app will automatically generate local template files using the standard template definitions so you can proceed without interruption.</p>
+                    </details>
+                </div>
+            </section>
         </div>
     </div>
 
-    <!-- Script handlers for Drag & Drop, Game Name extraction, and Manage Games Modal -->
+    <!-- Script handlers -->
     <script>
-        async function getGameNameFromWebview() {
-            try {
-                const wv = document.getElementById('webview');
-                const title = wv ? wv.getTitle() : '';
-                let name = title.replace(/— SteamDB$/, '').replace(/on Steam$/, '').replace(/ - Steam Store$/, '').trim();
-                return name || 'Unknown Game';
-            } catch (e) {
-                return 'Unknown Game';
-            }
-        }
-
-        // Override the Add to Steam button handler to pass game name
-        document.addEventListener('DOMContentLoaded', () => {
-            const addToSteamBtn = document.getElementById('addToSteamBtn');
-            if (addToSteamBtn) {
-                // Replace default listener clone or intercept
-                const newBtn = addToSteamBtn.cloneNode(true);
-                addToSteamBtn.parentNode.replaceChild(newBtn, addToSteamBtn);
-
-                newBtn.addEventListener('click', async () => {
-                    const appIdElem = document.getElementById('appIdDisplay');
-                    const currentAppId = appIdElem ? appIdElem.textContent : null;
-
-                    if (!currentAppId || currentAppId === '—') {
-                        alert('No App ID detected!');
-                        return;
-                    }
-
-                    const gameName = await getGameNameFromWebview();
-
-                    if (confirm(`Add game "${gameName}" (App ID: ${currentAppId}) to Steam?`)) {
-                        newBtn.disabled = true;
-                        
-                        const progContainer = document.getElementById('progressContainer');
-                        const progText = document.getElementById('progressText');
-                        const progPercent = document.getElementById('progressPercent');
-                        const progFill = document.getElementById('progressFill');
-                        
-                        if (progContainer) progContainer.style.display = 'block';
-                        if (progText) progText.textContent = 'Starting download...';
-                        if (progPercent) progPercent.textContent = '0%';
-                        if (progFill) progFill.style.width = '0%';
-
-                        const res = await window.electronAPI.downloadGame({ appId: currentAppId, gameName });
-                        
-                        if (progContainer) {
-                            setTimeout(() => { progContainer.style.display = 'none'; }, 2000);
-                        }
-                        newBtn.disabled = false;
-
-                        if (res.success) {
-                            alert(res.message);
-                            if (confirm('Do you want to restart Steam now?')) {
-                                await window.electronAPI.closeSteam();
-                                await new Promise(r => setTimeout(r, 3000));
-                                await window.electronAPI.startSteam();
-                            }
-                        } else {
-                            alert('Error: ' + res.message);
-                        }
-                    }
-                });
-            }
-        });
-
         const dropZone = document.getElementById('dropZone');
         if (dropZone) {
             dropZone.addEventListener('dragover', (e) => {
@@ -437,25 +430,24 @@
                     return;
                 }
 
-                const gameName = await getGameNameFromWebview();
                 const filesData = [];
                 for (const f of e.dataTransfer.files) {
                     const arrayBuffer = await f.arrayBuffer();
                     filesData.push({ name: f.name, data: Array.from(new Uint8Array(arrayBuffer)) });
                 }
 
-                const res = await window.electronAPI.installDroppedFiles({ appId, files: filesData, gameName });
+                const res = await window.electronAPI.installDroppedFiles({ appId, files: filesData });
                 if (res.success) {
                     setTimeout(() => {
-                        alert(`Successfully installed ${res.count} dropped file(s) for "${gameName}"!`);
-                    }, 1000);
+                        alert(`Successfully installed ${res.count} dropped file(s) into Steam directories!`);
+                    }, 2000);
                 } else {
                     alert('Failed to process dropped files.');
                 }
             });
         }
 
-        // Manage Games Modal Logic with Game Name Display
+        // Manage Games Modal Logic
         const manageGamesBtn = document.getElementById('manageGamesBtn');
         const manageGamesModal = document.getElementById('manageGamesModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -466,25 +458,21 @@
             try {
                 const games = await window.electronAPI.getInstalledGames();
                 if (!games || games.length === 0) {
-                    installedGamesListContainer.innerHTML = '<div class="no-games">No added games found in Steam path.</div>';
+                    installedGamesListContainer.innerHTML = '<div class="no-games">No added games found via Steam Injector.</div>';
                     return;
                 }
 
                 let html = '';
-                games.forEach(game => {
+                games.forEach(appId => {
                     html += `
                         <div class="game-list-item">
-                            <div>
-                                <span style="color: #fff; font-size: 0.95rem; font-weight: bold; display: block; margin-bottom: 2px;">${game.name}</span>
-                                <span style="color: #a1a1aa; font-family: monospace; font-size: 0.75rem;">App ID: ${game.appId} | Added: ${game.timeAdded}</span>
-                            </div>
-                            <button class="btn-remove-game" data-appid="${game.appId}">Remove</button>
+                            <span>App ID: ${appId}</span>
+                            <button class="btn-remove-game" data-appid="${appId}">Remove</button>
                         </div>
                     `;
                 });
                 installedGamesListContainer.innerHTML = html;
 
-                // Attach remove handlers
                 document.querySelectorAll('.btn-remove-game').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                         const targetId = e.target.getAttribute('data-appid');
@@ -499,7 +487,7 @@
                     });
                 });
             } catch (err) {
-                installedGamesListContainer.innerHTML = '<div class="no-games">Error loading installed games. Check Steam path configuration.</div>';
+                installedGamesListContainer.innerHTML = '<div class="no-games">Error loading added games. Check Steam path configuration.</div>';
             }
         }
 
