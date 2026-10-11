@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="styles-new.css" id="uiNewCss">
     <link rel="stylesheet" href="styles-aurora.css" id="uiAuroraCss">
+    <link rel="stylesheet" href="styles-themes.css" id="uiThemesCss">
     <link rel="stylesheet" href="settings.css">
     <script src="ui.js"></script>
 </head>
@@ -22,7 +23,7 @@
                     <defs>
                         <clipPath id="spClip"><rect class="sp-fill-rect" x="0" y="0" width="120" height="120"/></clipPath>
                         <linearGradient id="auroraStroke" x1="0" y1="0" x2="1" y2="1">
-                            <stop offset="0" stop-color="#a392ff"/><stop offset="0.55" stop-color="#5fb3ff"/><stop offset="1" stop-color="#36d6c6"/>
+                            <stop offset="0" style="stop-color:var(--accent)"/><stop offset="0.55" style="stop-color:var(--accent-mid, var(--accent))"/><stop offset="1" style="stop-color:var(--accent-2)"/>
                         </linearGradient>
                     </defs>
                     <circle class="sp-track" cx="60" cy="60" r="52"/>
@@ -49,6 +50,7 @@
             </div>
         </div>
     </div>
+    <script src="splash.js"></script>
 <script>
     const dropZone = document.getElementById('dropZone');
 
@@ -228,6 +230,13 @@
                     <select id="languageSelect" class="language-selector" hidden>
                         <option value="en" selected>English</option>
                     </select>
+                    <div class="help-wrap">
+                        <button id="helpBtn" class="help-btn attention" type="button" aria-haspopup="dialog" title="Help (press ?)">
+                            <span class="help-btn-icon" aria-hidden="true">?</span>
+                            <span>Help</span>
+                        </button>
+                        <div id="helpTip" class="help-tip" role="note">New here? Take the 30-second tour</div>
+                    </div>
                     <button id="settingsBtn" class="settings-btn" type="button" title="Settings" aria-label="Open settings" aria-haspopup="dialog">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                     </button>
@@ -383,9 +392,9 @@
             </button>
             <h2 id="settingsTitle">Settings</h2>
             <fieldset class="settings-group">
-                <legend>Interface</legend>
-                <p class="settings-hint">Changes apply right away and are remembered next time you open the app.</p>
-                <div class="ui-options">
+                <legend>Layout</legend>
+                <p class="settings-hint">Two classic layouts. Changes apply right away and are remembered next time you open the app.</p>
+                <div class="ui-options cols-2">
                     <label class="ui-option">
                         <input type="radio" name="uiMode" value="new" checked>
                         <span class="ui-option-body">
@@ -408,17 +417,64 @@
                             <span class="ui-option-desc">The previous look, with controls in a sidebar beside the browser.</span>
                         </span>
                     </label>
+                </div>
+            </fieldset>
+            <fieldset class="settings-group">
+                <legend>Themes</legend>
+                <p class="settings-hint">Glassy sidebar layout with smooth motion, in four different moods.</p>
+                <div class="ui-options cols-4">
                     <label class="ui-option">
                         <input type="radio" name="uiMode" value="aurora">
                         <span class="ui-option-body">
-                            <span class="ui-thumb is-aurora" aria-hidden="true">
+                            <span class="ui-thumb is-theme t-aurora" style="--ta:#a392ff;--tb:#36d6c6;--tbg:#0d0b24" aria-hidden="true">
                                 <span class="side"><i class="hot"></i><i></i><i></i></span>
                                 <i class="web"></i>
                             </span>
                             <span class="ui-option-name">Aurora</span>
-                            <span class="ui-option-desc">Frosted glass over a soft animated glow, with smooth motion throughout.</span>
+                            <span class="ui-option-desc">Frosted glass over a soft, slowly moving glow.</span>
                         </span>
                     </label>
+                    <label class="ui-option">
+                        <input type="radio" name="uiMode" value="neon">
+                        <span class="ui-option-body">
+                            <span class="ui-thumb is-theme t-neon" style="--ta:#22f0ff;--tb:#ff2bd6;--tbg:#04050c" aria-hidden="true">
+                                <span class="side"><i class="hot"></i><i></i><i></i></span>
+                                <i class="web"></i>
+                            </span>
+                            <span class="ui-option-name">Neon</span>
+                            <span class="ui-option-desc">Night-city terminal: cyan and magenta light, sharp edges.</span>
+                        </span>
+                    </label>
+                    <label class="ui-option">
+                        <input type="radio" name="uiMode" value="ember">
+                        <span class="ui-option-body">
+                            <span class="ui-thumb is-theme t-ember" style="--ta:#ffa14d;--tb:#ff4d5a;--tbg:#160c09" aria-hidden="true">
+                                <span class="side"><i class="hot"></i><i></i><i></i></span>
+                                <i class="web"></i>
+                            </span>
+                            <span class="ui-option-name">Ember</span>
+                            <span class="ui-option-desc">Warm brass and rising embers with a serif voice.</span>
+                        </span>
+                    </label>
+                    <label class="ui-option">
+                        <input type="radio" name="uiMode" value="daylight">
+                        <span class="ui-option-body">
+                            <span class="ui-thumb is-theme t-daylight" style="--ta:#5b4bff;--tb:#0e7490;--tbg:#eef1fb" aria-hidden="true">
+                                <span class="side"><i class="hot"></i><i></i><i></i></span>
+                                <i class="web"></i>
+                            </span>
+                            <span class="ui-option-name">Daylight</span>
+                            <span class="ui-option-desc">Clean, bright and airy. Easy on daytime eyes.</span>
+                        </span>
+                    </label>
+                </div>
+            </fieldset>
+            <fieldset class="settings-group">
+                <legend>Animations</legend>
+                <p class="settings-hint">Reduced switches off background effects and most movement. Good for older PCs or if motion bothers you.</p>
+                <div class="seg" role="radiogroup" aria-label="Animations">
+                    <label class="seg-item"><input type="radio" name="motion" value="full" checked><span>Full</span></label>
+                    <label class="seg-item"><input type="radio" name="motion" value="reduced"><span>Reduced</span></label>
                 </div>
             </fieldset>
         </div>
