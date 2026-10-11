@@ -16,7 +16,7 @@
         }
         .modal-overlay.open { opacity: 1; pointer-events: auto; }
         .modal-content {
-            background: #1e1e2f; border: 1px solid #33334d; width: 500px; max-height: 80vh;
+            background: #1e1e2f; border: 1px solid #33334d; width: 520px; max-height: 80vh;
             border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
         .modal-header { padding: 16px 20px; border-bottom: 1px solid #33334d; display: flex; justify-content: space-between; align-items: center; }
@@ -25,9 +25,8 @@
         .modal-body { padding: 20px; overflow-y: auto; flex-grow: 1; }
         .game-list-item {
             display: flex; justify-content: space-between; align-items: center;
-            background: #27273f; padding: 10px 14px; border-radius: 6px; margin-bottom: 8px;
+            background: #27273f; padding: 12px 16px; border-radius: 6px; margin-bottom: 8px;
         }
-        .game-list-item span { color: #fff; font-family: monospace; font-size: 0.9rem; }
         .btn-remove-game {
             background: #ef4444; color: #fff; border: none; padding: 6px 12px;
             border-radius: 4px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s;
@@ -346,8 +345,73 @@
         </div>
     </div>
 
-    <!-- Script handlers for Drag & Drop and Manage Games Modal -->
+    <!-- Script handlers for Drag & Drop, Game Name extraction, and Manage Games Modal -->
     <script>
+        async function getGameNameFromWebview() {
+            try {
+                const wv = document.getElementById('webview');
+                const title = wv ? wv.getTitle() : '';
+                let name = title.replace(/— SteamDB$/, '').replace(/on Steam$/, '').replace(/ - Steam Store$/, '').trim();
+                return name || 'Unknown Game';
+            } catch (e) {
+                return 'Unknown Game';
+            }
+        }
+
+        // Override the Add to Steam button handler to pass game name
+        document.addEventListener('DOMContentLoaded', () => {
+            const addToSteamBtn = document.getElementById('addToSteamBtn');
+            if (addToSteamBtn) {
+                // Replace default listener clone or intercept
+                const newBtn = addToSteamBtn.cloneNode(true);
+                addToSteamBtn.parentNode.replaceChild(newBtn, addToSteamBtn);
+
+                newBtn.addEventListener('click', async () => {
+                    const appIdElem = document.getElementById('appIdDisplay');
+                    const currentAppId = appIdElem ? appIdElem.textContent : null;
+
+                    if (!currentAppId || currentAppId === '—') {
+                        alert('No App ID detected!');
+                        return;
+                    }
+
+                    const gameName = await getGameNameFromWebview();
+
+                    if (confirm(`Add game "${gameName}" (App ID: ${currentAppId}) to Steam?`)) {
+                        newBtn.disabled = true;
+                        
+                        const progContainer = document.getElementById('progressContainer');
+                        const progText = document.getElementById('progressText');
+                        const progPercent = document.getElementById('progressPercent');
+                        const progFill = document.getElementById('progressFill');
+                        
+                        if (progContainer) progContainer.style.display = 'block';
+                        if (progText) progText.textContent = 'Starting download...';
+                        if (progPercent) progPercent.textContent = '0%';
+                        if (progFill) progFill.style.width = '0%';
+
+                        const res = await window.electronAPI.downloadGame({ appId: currentAppId, gameName });
+                        
+                        if (progContainer) {
+                            setTimeout(() => { progContainer.style.display = 'none'; }, 2000);
+                        }
+                        newBtn.disabled = false;
+
+                        if (res.success) {
+                            alert(res.message);
+                            if (confirm('Do you want to restart Steam now?')) {
+                                await window.electronAPI.closeSteam();
+                                await new Promise(r => setTimeout(r, 3000));
+                                await window.electronAPI.startSteam();
+                            }
+                        } else {
+                            alert('Error: ' + res.message);
+                        }
+                    }
+                });
+            }
+        });
+
         const dropZone = document.getElementById('dropZone');
         if (dropZone) {
             dropZone.addEventListener('dragover', (e) => {
@@ -373,24 +437,25 @@
                     return;
                 }
 
+                const gameName = await getGameNameFromWebview();
                 const filesData = [];
                 for (const f of e.dataTransfer.files) {
                     const arrayBuffer = await f.arrayBuffer();
                     filesData.push({ name: f.name, data: Array.from(new Uint8Array(arrayBuffer)) });
                 }
 
-                const res = await window.electronAPI.installDroppedFiles({ appId, files: filesData });
+                const res = await window.electronAPI.installDroppedFiles({ appId, files: filesData, gameName });
                 if (res.success) {
                     setTimeout(() => {
-                        alert(`Successfully installed ${res.count} dropped file(s) into Steam directories!`);
-                    }, 2000);
+                        alert(`Successfully installed ${res.count} dropped file(s) for "${gameName}"!`);
+                    }, 1000);
                 } else {
                     alert('Failed to process dropped files.');
                 }
             });
         }
 
-        // Manage Games Modal Logic with Saved Time Display
+        // Manage Games Modal Logic with Game Name Display
         const manageGamesBtn = document.getElementById('manageGamesBtn');
         const manageGamesModal = document.getElementById('manageGamesModal');
         const closeModalBtn = document.getElementById('closeModalBtn');
@@ -408,10 +473,10 @@
                 let html = '';
                 games.forEach(game => {
                     html += `
-                        <div class="game-list-item" style="display: flex; justify-content: space-between; align-items: center; background: #27273f; padding: 10px 14px; border-radius: 6px; margin-bottom: 8px;">
+                        <div class="game-list-item">
                             <div>
-                                <span style="color: #fff; font-family: monospace; font-size: 0.9rem; display: block;">App ID: ${game.appId}</span>
-                                <span style="color: #a1a1aa; font-size: 0.75rem;">Added: ${game.timeAdded}</span>
+                                <span style="color: #fff; font-size: 0.95rem; font-weight: bold; display: block; margin-bottom: 2px;">${game.name}</span>
+                                <span style="color: #a1a1aa; font-family: monospace; font-size: 0.75rem;">App ID: ${game.appId} | Added: ${game.timeAdded}</span>
                             </div>
                             <button class="btn-remove-game" data-appid="${game.appId}">Remove</button>
                         </div>
