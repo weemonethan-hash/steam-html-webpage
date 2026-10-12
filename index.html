@@ -217,30 +217,30 @@
         <header class="header">
             <div class="header-content">
                 <div class="logo-section">
-                    <div class="logo-icon" style="background: transparent; border: none; box-shadow: none;">
+                    <div class="logo-icon" aria-hidden="true">
                         <img src="logo.png" alt="Logo" style="width: 100%; height: 100%; object-fit: contain;">
                     </div>
+                    <div class="brand">
+                        <h1 class="title">Steam Injector</h1>
+                        <span class="tagline">Add games to Steam in a few clicks</span>
+                    </div>
+                    <span class="version" style="font-weight: bold;">v1.0</span>
                 </div>
-                <div class="brand">
-                    <h1 class="title">Steam Injector</h1>
-                    <span class="tagline">Add games to Steam in a few clicks</span>
-                </div>
-                <span class="version" style="font-weight: bold;">v1.0</span>
-            </div>
-            <div class="header-controls">
-                <select id="languageSelect" class="language-selector" hidden>
-                    <option value="en" selected>English</option>
-                </select>
-                <div class="help-wrap">
-                    <button id="helpBtn" class="help-btn attention" type="button" aria-haspopup="dialog" title="Help (press ?)">
-                        <span class="help-btn-icon" aria-hidden="true">?</span>
-                        <span>Help</span>
+                <div class="header-controls">
+                    <select id="languageSelect" class="language-selector" hidden>
+                        <option value="en" selected>English</option>
+                    </select>
+                    <div class="help-wrap">
+                        <button id="helpBtn" class="help-btn attention" type="button" aria-haspopup="dialog" title="Help (press ?)">
+                            <span class="help-btn-icon" aria-hidden="true">?</span>
+                            <span>Help</span>
+                        </button>
+                        <div id="helpTip" class="help-tip" role="note">New here? Take the 30-second tour</div>
+                    </div>
+                    <button id="settingsBtn" class="settings-btn" type="button" title="Settings" aria-label="Open settings" aria-haspopup="dialog">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                     </button>
-                    <div id="helpTip" class="help-tip" role="note">New here? Take the 30-second tour</div>
                 </div>
-                <button id="settingsBtn" class="settings-btn" type="button" title="Settings" aria-label="Open settings" aria-haspopup="dialog">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                </button>
             </div>
         </header>
 
